@@ -51,6 +51,25 @@ Prod
 - `dc exec app composer install` — выполнение команд в контейнере
 - `dc exec app bash` — подключиться к контейнеру
 
+## Настройка админбара
+
+Если ваш проект размещён на 35 сервере, то вам достаточно обновить пакет админбара и опубликовать конфиг файл и стили командами:
+
+`php artisan vendor:publish --tag=NovaAdminBarConfig --force`
+
+и
+
+`php artisan vendor:publish --tag=NovaAdminBarAssets --force`
+
+Больше вам делать ничего не нужно.
+Но если ваш проект на 188 сервере, то для вывода ветки и коммита вам нужно прокидывать эти данные в CI при выкате в файл .env. Для этого нужно добавить в CI следующие команды:
+
+`sed -i 's/GIT_COMMIT=.*/GIT_COMMIT=\""$CI_COMMIT_MESSAGE"\"/' .env &&`
+
+`sed -i 's/GIT_BRANCH=.*/GIT_BRANCH=\""$CI_COMMIT_BRANCH"\"/' .env &&`
+
+`sed -i 's/GIT_DATE=.*/GIT_DATE=\""$CI_COMMIT_TIMESTAMP"\"/' .env` 
+
 ## PreCommit hooks
 
 - Если хук возвращает code style errors, пофиксите с помощью команды: `docker-compose exec app vendor/bin/composer csfix`, добавьте изменения в коммит.
