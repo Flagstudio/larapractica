@@ -1,43 +1,16 @@
-version: '3'
+version: '3.5'
 
 services:
-
-### PHP-FPM + Caddy ##############################################
-    app:
-      container_name: ${COMPOSE_PROJECT_NAME}_app_base
-      build:
-        args:
-          - NOVA_USERNAME=${NOVA_USERNAME}
-          - NOVA_PASSWORD=${NOVA_PASSWORD}
-          - PHP_VERSION=${PHP_VERSION}
-        context: .
-        dockerfile: docker/app/Dockerfile_base_image${PHP_VERSION}
-      image: registry.gitlab.com/flagstudio/laraflag:php-${PHP_VERSION}-base # образ, который строим. НЕ ТОТ из которого строимся
-      ports:
-        - "8080:8080"
-
-
-  ### MySQL ################################################
-    mysql:
-      build:
-        args:
-          - MYSQL_VERSION=${MYSQL_VERSION}
-        context: ./docker/mysql
-      environment:
-        - TZ=Europe/Moscow
-      image: registry.gitlab.com/flagstudio/laraflag:mysql-${MYSQL_VERSION}-base # образ, который строим. НЕ ТОТ из которого строимся
-      ports:
-        - "127.0.0.1:3306:3306"
-
-  ### ElasticSearch ########################################
-    elasticsearch:
-      build:
-        context: ./docker/elasticsearch
-      image: registry.gitlab.com/flagstudio/laraflag:elasticsearch-7.6.2
-      environment:
-        - cluster.name=laradock-cluster
-        - node.name=laradock-node
-        - bootstrap.memory_lock=true
-        - "ES_JAVA_OPTS=-Xms1024m -Xmx1024m"
-        - cluster.initial_master_nodes=laradock-node
-
+  ### Just builds base image for future push to registry ##############################################
+  base:
+    container_name: ${COMPOSE_PROJECT_NAME}_base
+    build:
+      args:
+        - NOVA_USERNAME=${NOVA_USERNAME}
+        - NOVA_PASSWORD=${NOVA_PASSWORD}
+        - IMAGEMAGICK_VERSION=latest
+        - PHP_VERSION=${PHP_VERSION}
+        - NODE_VERSION=${NODE_VERSION}
+      context: .
+      dockerfile: docker/app/Dockerfile_php-fpm_base
+    image: ${IMAGE_REGISTRY_PATH}/${COMPOSE_PROJECT_NAME}:base

@@ -1,98 +1,129 @@
-version: '3'
+version: '3.5'
+
+networks:
+  project: # <- change this for COMPOSE_PROJECT_NAME env variable value
+    driver: overlay
+    external: true
+  traefik-public:
+    external: true
 
 services:
+  ### APP (PHP-FPM + NGINX) ##############################################
+  app:
+    container_name: ${COMPOSE_PROJECT_NAME}_app_prod
+    image: "${IMAGE_REGISTRY_PATH}/${COMPOSE_PROJECT_NAME}:${APP_IMAGE_TAG}"
+    volumes:
+      - ./.env:/var/www/.env
+      - ./storage:/var/www/storage
+    networks:
+      - traefik-public
+      - ${COMPOSE_PROJECT_NAME}
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik-public
+      - traefik.http.routers.secure-${COMPOSE_PROJECT_NAME}-app-router.middlewares=admin-auth
 
-### PHP-FPM + Caddy ##############################################
-    app:
-      container_name: ${COMPOSE_PROJECT_NAME}_app_prod
-      image: registry.gitlab.com/flagstudio/${COMPOSE_PROJECT_NAME}:latest
-      ports:
-        - "8080:8080"
-      volumes:
-        - ./.env:/var/www/.env
-        - ./storage:/var/www/storage
-      restart: unless-stopped
+      - traefik.http.services.${COMPOSE_PROJECT_NAME}-app-service.loadbalancer.server.port=${APP_PORT}
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-app-router.rule=Host(`${APP_URI}`)
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-app-router.entrypoints=http
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-app-router.service=${COMPOSE_PROJECT_NAME}-app-service
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-app-router.middlewares=https-redirect
 
-### MySQL ################################################
-    mysql:
-      image: registry.gitlab.com/flagstudio/laraflag:mysql-8.0-base
-      environment:
-        - MYSQL_DB=${DB_DATABASE}
-        - MYSQL_USER=${DB_USERNAME}
-        - MYSQL_PASSWORD=${DB_PASSWORD}
-        - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
-      volumes:
-        - ${DATA_PATH_HOST}/mysql:/var/lib/mysql
-      ports:
-        - "127.0.0.1:3306:3306"
-      restart: unless-stopped
+      - traefik.http.services.secure-${COMPOSE_PROJECT_NAME}-app-service.loadbalancer.server.port=${APP_PORT}
+      - traefik.http.routers.secure-${COMPOSE_PROJECT_NAME}-app-router.rule=Host(`${APP_URI}`)
+      - traefik.http.routers.secure-${COMPOSE_PROJECT_NAME}-app-router.entrypoints=https
+      - traefik.http.routers.secure-${COMPOSE_PROJECT_NAME}-app-router.service=${COMPOSE_PROJECT_NAME}-app-service
 
-### SSL proxy (Caddy Server) #########################################
-    ssl:
-      image: registry.gitlab.com/flagstudio/laraflag:ssl-base
-      ports:
-        - "443:443"
-        - "80:80"
-      volumes:
-        - ./Caddyfile_SSL:/etc/Caddyfile
+      - traefik.http.routers.secure-${COMPOSE_PROJECT_NAME}-app-router.tls=true
+      - traefik.http.routers.secure-${COMPOSE_PROJECT_NAME}-app-router.tls.certresolver=le
+    depends_on:
+      - postgres
+      - redis
 
-### PostgreSQL ###########################################
-    postgres:
-      image: postgres:alpine
-      command: postgres
-      environment:
-        - POSTGRES_DB=${DB_DATABASE}
-        - POSTGRES_USER=${DB_USERNAME}
-        - POSTGRES_PASSWORD=${DB_PASSWORD}
-      volumes:
-        - ${DATA_PATH_HOST}/postgres:/var/lib/postgresql/data
-      ports:
-        - "127.0.0.1:5432:5432"
-      restart: unless-stopped
+  ### PostgreSQL ###########################################
+  postgres:
+    container_name: ${COMPOSE_PROJECT_NAME}_postgres
+    image: postgres:13.2-alpine
+    command: postgres
+    environment:
+      - POSTGRES_DB=${DB_DATABASE}
+      - POSTGRES_USER=${DB_USERNAME}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    volumes:
+      - ${DATA_PATH_HOST}/postgres:/var/lib/postgresql/data:delegated
+    ports:
+      - ${DB_EXTERNAL_PORT}:5432
+    networks:
+      - ${COMPOSE_PROJECT_NAME}
+    restart: always
 
-  ### ElasticSearch ########################################
-    elasticsearch:
-      image: registry.gitlab.com/flagstudio/laraflag:elasticsearch-7.6.2
-      volumes:
-        - ${ELASTICSEARCH_CONFIG_PATH}:/usr/share/elasticsearch/data
-      environment:
-        - cluster.name=laradock-cluster
-        - node.name=laradock-node
-        - bootstrap.memory_lock=true
-        - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-        - cluster.initial_master_nodes=laradock-node
-      ulimits:
-        memlock:
-          soft: -1
-          hard: -1
-      ports:
-        - "127.0.0.1:${ELASTICSEARCH_HOST_HTTP_PORT}:9200"
-        - "127.0.0.1:${ELASTICSEARCH_HOST_TRANSPORT_PORT}:9300"
+  ### Redis ############################################
+  redis:
+    container_name: ${COMPOSE_PROJECT_NAME}_redis
+    image: redis:6.2.5-buster
+    command: redis-server --requirepass ${REDIS_PASSWORD} --appendonly yes
+    volumes:
+      - ${DATA_PATH_HOST}/redis:/data
+    networks:
+      - ${COMPOSE_PROJECT_NAME}
+    restart: always
 
-    elastichq:
-      image: elastichq/elasticsearch-hq
-      ports:
-        - 5000:5000
-      depends_on:
-        - elasticsearch
-
-  ### NetData ################################################
-    netdata:
-      image: netdata/netdata:latest
-      cap_add:
-        - SYS_PTRACE
-      volumes:
-        - /proc:/host/proc:ro
-        - /sys:/host/sys:ro
-        - /var/run/docker.sock:/var/run/docker.sock:ro
-        - ./netdata/health.d:/etc/netdata/health.d
-        - ./netdata/health_alarm_notify.conf:/etc/netdata/health_alarm_notify.conf
-        - ./netdata/netdata.conf:/etc/netdata/netdata.conf
-      ports:
-        - "127.0.0.1:${NETDATA_PORT}:19999"
+  ### MySQL ################################################
+#  mysql:
+#    image: registry.gitlab.com/flagstudio/laraflag:mysql-8.0-base
+#    environment:
+#      - MYSQL_DB=${DB_DATABASE}
+#      - MYSQL_USER=${DB_USERNAME}
+#      - MYSQL_PASSWORD=${DB_PASSWORD}
+#      - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
+#    volumes:
+#      - ${DATA_PATH_HOST}/mysql:/var/lib/mysql:delegated
+#    ports:
+#      - ${DB_EXTERNAL_PORT}:3306
+#    restart: always
 
   ### Meilisearch ###########################################
-    meilisearch:
-      image: getmeili/meilisearch:v0.21.0rc6
-      volumes:
-        - ${DATA_PATH_HOST}/ms:/data.ms
+#  meilisearch:
+#    container_name: ${COMPOSE_PROJECT_NAME}_meilisearch
+#    image: getmeili/meilisearch:v0.24.0
+#    volumes:
+#      - ${DATA_PATH_HOST}/meilisearch:/data.ms
+#    networks:
+#      - ${COMPOSE_PROJECT_NAME}
+#    labels:
+#      - traefik.enable=true
+#      - traefik.docker.network=${COMPOSE_PROJECT_NAME}
+#
+#      - traefik.http.services.${COMPOSE_PROJECT_NAME}-search-service.loadbalancer.server.port=${MEILISEARCH_PORT}
+#      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-search-router.rule=Host(`${MEILISEARCH_URI}`)
+#      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-search.entrypoints=http
+#      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-search-router.service=${COMPOSE_PROJECT_NAME}-search-service
+#    restart: always
+
+  ### ElasticSearch ########################################
+#  elasticsearch:
+#    image: elasticsearch:7.10.1
+#    volumes:
+#      - ${DATA_PATH_HOST}/elasticsearch:/usr/share/elasticsearch/data
+#    environment:
+#      - bootstrap.memory_lock=true
+#      - discovery.type=single-node
+#      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+#    ports:
+#      - 9200:9200
+#      - ${ELASTICSEARCH_HOST_HTTP_PORT}:${ELASTICSEARCH_HOST_HTTP_PORT}
+#    ulimits:
+#      memlock:
+#        soft: -1
+#        hard: -1
+#    networks:
+#      - ${COMPOSE_PROJECT_NAME}
+#    labels:
+#      - traefik.enable=true
+#      - traefik.docker.network=${COMPOSE_PROJECT_NAME}
+#
+#      - traefik.http.services.${COMPOSE_PROJECT_NAME}-elastic-service.loadbalancer.server.port=${ELASTICSEARCH_HOST_HTTP_PORT}
+#      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-elastic-router.rule=Host(`${ELASTICSEARCH_URI}`)
+#      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-elastic.entrypoints=http
+#      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-elastic-router.service=${COMPOSE_PROJECT_NAME}-elastic-service
+#    restart: always

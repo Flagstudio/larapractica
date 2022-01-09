@@ -1,0 +1,87 @@
+# This is app image build in GitLab CI
+ARG IMAGE_REGISTRY_PATH=registry.gitlab.com/flagstudio
+ARG COMPOSE_PROJECT_NAME
+
+FROM ${IMAGE_REGISTRY_PATH}/${COMPOSE_PROJECT_NAME}:base
+
+# Start as root
+USER root
+
+###########################################################################
+# Configs
+###########################################################################
+
+COPY ./docker/app/laraflag.ini /usr/local/etc/php/conf.d
+COPY ./docker/app/www.conf /usr/local/etc/php-fpm.d/www.conf
+COPY ./docker/app/supervisord.conf /etc/supervisord.conf
+COPY ./docker/app/crontab /var/spool/cron/crontabs/root
+RUN crontab /var/spool/cron/crontabs/root
+
+###########################################################################
+# Copy code
+###########################################################################
+
+USER www-data:www-data
+COPY . /var/www/
+WORKDIR /var/www
+
+USER root
+
+RUN echo "" >> ~/.bashrc \
+    && echo 'export PATH="~/.composer/vendor/bin:$PATH"' >> ~/.bashrc \
+    && mkdir -p /var/www/storage/app/public \
+    /var/www/storage/framework/views \
+    /var/www/storage/framework/cache/data \
+    /var/www/storage/framework/sessions \
+    /var/www/storage/logs \
+    && rm -Rf /var/www/bootstrap/cache/** \
+    && chmod -R 0777 /var/www/storage /var/www/bootstrap
+
+###########################################################################
+# Laravel Nova
+###########################################################################
+# Nova CMS credentials
+ARG INSTALL_NOVA=true
+ARG NOVA_USERNAME
+ARG NOVA_PASSWORD
+ENV NOVA_USERNAME=$NOVA_USERNAME
+ENV NOVA_PASSWORD=$NOVA_PASSWORD
+
+RUN if [ ${INSTALL_NOVA} = true ]; then \
+    composer global config http-basic.nova.laravel.com ${NOVA_USERNAME} ${NOVA_PASSWORD} \
+    && echo "NOVA CREDENTIALS ARE SETS" \
+;fi
+
+###########################################################################
+# Composer packages
+###########################################################################
+
+ARG WITH_DEV=false
+
+RUN if [ ${WITH_DEV} = true ] ; then \
+        composer install --no-interaction --optimize-autoloader; \
+    else \
+        composer install --optimize-autoloader --no-interaction --no-dev --no-scripts; \
+    fi
+
+###########################################################################
+# NPM
+###########################################################################
+
+RUN npm i \
+    && npm run prod \
+    && npm cache clean --force
+
+###########################################################################
+# Prepare Laravel for Prod
+###########################################################################
+
+RUN php artisan package:discover \
+    && php artisan storage:link \
+    && php artisan route:cache
+
+CMD ["/usr/bin/supervisord", "-n", "-c",  "/etc/supervisord.conf"]
+
+EXPOSE 8888 9000
+
+

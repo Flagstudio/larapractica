@@ -19,7 +19,6 @@ class NovaServiceProvider extends NovaApplicationServiceProvider
     public function boot()
     {
         parent::boot();
-
         Nova::style('admin', public_path('css/nova.css'));
     }
 
@@ -51,7 +50,7 @@ class NovaServiceProvider extends NovaApplicationServiceProvider
     }
 
     /**
-     * Get the cards that should be displayed on the Nova dashboard.
+     * Get the cards that should be displayed on the default Nova dashboard.
      *
      * @return array
      */
@@ -60,6 +59,18 @@ class NovaServiceProvider extends NovaApplicationServiceProvider
         return [
             new NovaContacts,
             new NovaInstructions,
+        ];
+    }
+
+    /**
+     * Get the extra dashboards that should be displayed on the Nova dashboard.
+     *
+     * @return array
+     */
+    protected function dashboards()
+    {
+        return [
+            new ExampleDashboard(),
         ];
     }
 
@@ -81,15 +92,5 @@ class NovaServiceProvider extends NovaApplicationServiceProvider
     public function register()
     {
         $this->app->bind('Laravel\Nova\Http\Controllers\ResourceUpdateController', 'App\Http\Controllers\Nova\ResourceUpdateController');
-    }
-
-    /**
-     * @return array
-     */
-    public function dashboards():array
-    {
-        return [
-            new ExampleDashboard(),
-        ];
     }
 }

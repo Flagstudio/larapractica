@@ -1,0 +1,16 @@
+version: '3.5'
+
+services:
+  ### Just builds app image like in CI but doing it locally ##############################################
+  base:
+    container_name: ${COMPOSE_PROJECT_NAME}_app_${APP_IMAGE_TAG}
+    build:
+      args:
+        - IMAGE_REGISTRY_PATH=${IMAGE_REGISTRY_PATH}
+        - COMPOSE_PROJECT_NAME=${COMPOSE_PROJECT_NAME}
+        - NOVA_USERNAME=${NOVA_USERNAME}
+        - NOVA_PASSWORD=${NOVA_PASSWORD}
+        - INSTALL_NOVA=${INSTALL_NOVA:-true}
+      context: .
+      dockerfile: docker/app/Dockerfile_app_build
+    image: ${IMAGE_REGISTRY_PATH}/${COMPOSE_PROJECT_NAME}:${APP_IMAGE_TAG}

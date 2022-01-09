@@ -1,0 +1,32 @@
+# This is app image build for local development
+ARG IMAGE_REGISTRY_PATH=registry.gitlab.com
+ARG COMPOSE_PROJECT_NAME
+
+FROM ${IMAGE_REGISTRY_PATH}/${COMPOSE_PROJECT_NAME}:base
+
+# Start as root
+USER root
+
+###########################################################################
+# Configs
+###########################################################################
+
+COPY ./docker/app/laraflag.ini /usr/local/etc/php/conf.d
+COPY ./docker/app/www.conf /usr/local/etc/php-fpm.d/www.conf
+COPY ./docker/app/supervisord.conf /etc/supervisord.conf
+COPY ./docker/app/crontab /var/spool/cron/crontabs/root
+RUN crontab /var/spool/cron/crontabs/root
+
+WORKDIR /var/www
+
+ARG INSTALL_NOVA=true
+RUN if [ ${INSTALL_NOVA} = true ]; then \
+    composer global config http-basic.nova.laravel.com ${NOVA_USERNAME} ${NOVA_PASSWORD} \
+    && echo "NOVA CREDENTIALS ARE SETS" \
+;fi
+
+CMD ["/usr/bin/supervisord", "-n", "-c",  "/etc/supervisord.conf"]
+
+EXPOSE 8888 9000
+
+

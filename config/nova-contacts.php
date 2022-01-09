@@ -1,10 +1,10 @@
 <?php
 
 return [
-    'test_url' => env('STAGING_URL', 'http://domain.tld'),
-    'basic_auth_login' => env('STAGING_BASIC_LOGIN', ''),
-    'basic_auth_password' => env('STAGING_BASIC_PASSWORD', ''),
-    'manager_name' => 'Имя менеджера',
-    'manager_email' => 'user@flagstudio.ru',
-    'phone' => '+7 (123) 456-78-90',
+    'test_url' => env('APP_URL', 'http://flagstudio.ru'),
+    'basic_auth_login' => env('BASIC_AUTH_USERNAME'),
+    'basic_auth_password' => env('BASIC_AUTH_PASSWORD'),
+    'manager_name' => 'please set the value in config/nova-contacts.php',
+    'manager_email' => 'please set the value in config/nova-contacts.php',
+    'phone' => ' +7 (343) 287-53-70',
 ];
