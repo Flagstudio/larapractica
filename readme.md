@@ -5,9 +5,13 @@ Defeloper: [Flag Studio](https://flagstudio.ru)
 ## Services:
 
 - app
-    + Debian base (registry.gitlab.com/keeper/base)
-    + Node 16.13.1
-    + PHP: 8.1.1
+    + Debian base (registry.gitlab.com/flagstudio/<project_name>/base)
+      - Node 16.13.1
+      - PHP: 8.1.1
+      - Composer 
+      - Nginx
+      - Opcache
+      - Nova creds
     + Laravel: 8.77.1
     + Laravel nova: 3.30.0
 - postgres (can be swapped to mysql)

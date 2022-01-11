@@ -4,11 +4,10 @@ variables:
   DOCKER_DRIVER: overlay2
   DOCKER_TLS_CERTDIR: "/certs"
 
+## Uncomment the desired CI stage start sections ##
 stages:
-  - build
-  - deploy
-
-## Uncomment the desired CI start sections ##
+  #- build
+  #- deploy
 
 ### MASTER #####################
 #build-master:
