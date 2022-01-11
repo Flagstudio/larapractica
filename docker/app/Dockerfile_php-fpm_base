@@ -103,8 +103,6 @@ COPY --from=composer:2.2.1 /usr/bin/composer /usr/bin/composer
 # ImageMagick:
 ###########################################################################
 
-ARG IMAGICK_LAST_COMMIT='448c1cd0d58ba2838b9b6dff71c9b7e70a401b90'
-
 ARG IMAGEMAGICK_VERSION=latest
 ENV IMAGEMAGICK_VERSION ${IMAGEMAGICK_VERSION}
 
@@ -135,7 +133,7 @@ RUN apt-get update --allow-releaseinfo-change -y \
 ###########################################################################
 
 # Check if NVM needs to be installed
-ARG NODE_VERSION=12
+ARG NODE_VERSION=16.13.1
 ARG INSTALL_NODE=true
 ARG INSTALL_NPM_VUE_CLI=false
 ENV NVM_DIR /home/node/.nvm
@@ -160,10 +158,6 @@ RUN if [ ${INSTALL_NODE} = true ]; then \
 
 # Add PATH for node
 ENV PATH $PATH:/home/node/.node-bin
-
-RUN if [ ${NPM_REGISTRY} ]; then \
-    . ~/.bashrc && npm config set registry ${NPM_REGISTRY} \
-;fi
 
 ###########################################################################
 # Nginx:
@@ -194,10 +188,18 @@ RUN if [ ${PHP_FPM_INSTALL_OPCACHE} = true ]; then \
 COPY ./docker/app/opcache.ini /usr/local/etc/php/conf.d/opcache.ini
 
 ###########################################################################
-# Set Laravel Nova Credentionals for future install:
+# Laravel Nova install:
 ###########################################################################
 
 ARG NOVA_USERNAME
 ARG NOVA_PASSWORD
 ENV NOVA_USERNAME=$NOVA_USERNAME
 ENV NOVA_PASSWORD=$NOVA_PASSWORD
+
+RUN if [ ${NOVA_USERNAME} ] && [ ${NOVA_PASSWORD} ]; then \
+composer global config http-basic.nova.laravel.com ${NOVA_USERNAME} ${NOVA_PASSWORD} \
+    && echo "NOVA CREDENTIALS ARE SETS" \
+    && echo ${NOVA_USERNAME} \
+    && echo ${NOVA_PASSWORD} \
+;fi
+

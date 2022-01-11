@@ -38,21 +38,6 @@ RUN echo "" >> ~/.bashrc \
     && chmod -R 0777 /var/www/storage /var/www/bootstrap
 
 ###########################################################################
-# Laravel Nova
-###########################################################################
-# Nova CMS credentials
-ARG INSTALL_NOVA=true
-ARG NOVA_USERNAME
-ARG NOVA_PASSWORD
-ENV NOVA_USERNAME=$NOVA_USERNAME
-ENV NOVA_PASSWORD=$NOVA_PASSWORD
-
-RUN if [ ${INSTALL_NOVA} = true ]; then \
-    composer global config http-basic.nova.laravel.com ${NOVA_USERNAME} ${NOVA_PASSWORD} \
-    && echo "NOVA CREDENTIALS ARE SETS" \
-;fi
-
-###########################################################################
 # Composer packages
 ###########################################################################
 
