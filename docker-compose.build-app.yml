@@ -8,6 +8,7 @@ services:
       args:
         - IMAGE_REGISTRY_PATH=${IMAGE_REGISTRY_PATH}
         - COMPOSE_PROJECT_NAME=${COMPOSE_PROJECT_NAME}
+        - WITH_DEV=true
       context: .
       dockerfile: docker/app/Dockerfile_app_build
     image: ${IMAGE_REGISTRY_PATH}/${COMPOSE_PROJECT_NAME}:${APP_IMAGE_TAG}
