@@ -5,9 +5,9 @@ variables:
   DOCKER_TLS_CERTDIR: "/certs"
 
 ## Uncomment the desired CI stage start sections ##
-stages:
-  #- build
-  #- deploy
+#stages:
+#  - build
+#  - deploy
 
 ### MASTER #####################
 #build-master:
