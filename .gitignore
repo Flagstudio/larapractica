@@ -41,3 +41,4 @@ core
 storage.tar.gz
 tools/ansible_deploy/
 bootstrap/cache/**
+ansible_deployer
