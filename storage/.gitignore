@@ -1,0 +1,8 @@
+!app/public/.gitignore
+!framework/cache/data/.gitignore
+!framework/sessions/.gitignore
+!framework/testing/.gitignore
+!framework/views/.gitignore
+!logs/.gitignore
+!tinx/.gitignore
+!.gitignore
