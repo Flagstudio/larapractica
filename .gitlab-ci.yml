@@ -104,11 +104,11 @@ variables:
 ### STAGING TEST #####################
 #build-develop:
 #  stage: build
-#  only:
-#    - '/^(?!master|premaster$).+$/'
 #  except:
 #    refs:
 #      - tags
+#      - master
+#      - premaster
 #    variables:
 #      - $CI_COMMIT_MESSAGE =~ /skip ci/
 #  services:
@@ -121,11 +121,11 @@ variables:
 #
 #deploy-develop:
 #  stage: deploy
-#  only:
-#    - '/^(?!master|premaster$).+$/'
 #  except:
 #    refs:
 #      - tags
+#      - master
+#      - premaster
 #    variables:
 #      - $CI_COMMIT_MESSAGE =~ /skip ci/
 #  before_script:
