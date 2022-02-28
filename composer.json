@@ -118,7 +118,8 @@
         "sort-packages": true,
         "platform-check": false,
         "allow-plugins": {
-            "composer/package-versions-deprecated": true
+            "composer/package-versions-deprecated": true,
+            "hirak/prestissimo": true
         }
     },
     "minimum-stability": "dev",
