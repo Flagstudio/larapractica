@@ -5,13 +5,9 @@ Defeloper: [Flag Studio](https://flagstudio.ru)
 ## Services:
 
 - app
-    + Debian base (registry.gitlab.com/flagstudio/<project_name>/base)
-      - Node 16.13.1
-      - PHP: 8.1.1
-      - Composer 
-      - Nginx
-      - Opcache
-      - Nova creds
+    + Debian base (registry.gitlab.com/keeper/base)
+    + Node 16.13.1
+    + PHP: 8.1.5
     + Laravel: 8.77.1
     + Laravel nova: 3.30.0
 - postgres (can be swapped to mysql)
@@ -38,8 +34,8 @@ Defeloper: [Flag Studio](https://flagstudio.ru)
 
 ### Docker Compose configuration files
 - utility compose files:
-    + `docker-compose.build-base.yml` — Just a utility setup for base image build, used for application ***base image*** build for future push to container registry, you can read [Build and push base image](#build-and-push-base-image) section
-    + `docker-compose.build-app.yml` — Just a utility setup for ***application image*** build, based on ***base image***, used for build and future push to container registry, you can read [Build and push app image](#build-and-push-app-image) section
+    + `docker-compose.build-base.yml` — Just an utility setup for base image build, used for application ***base image*** build for future push to container registry, you can read [Build and push base image](#build-and-push-base-image) section
+    + `docker-compose.build-app.yml` — Just an utility setup for ***application image*** build, based on ***base image***, used for build and future push to container registry, you can read [Build and push app image](#build-and-push-app-image) section
 - environment orchestration compose files:
     + `docker-compose.yml` — For local development
     + `docker-compose.prod.yml` — Orchestration setup to run on the ***production*** environment. Placed on a production server from ***master*** branch, renamed to docker-compose.yml, used by `Ansible Deployer`
@@ -56,6 +52,7 @@ Defeloper: [Flag Studio](https://flagstudio.ru)
 - `docker/app/crontab` — cron jobs
 - `docker/app/supervisord.conf` — supervisor
 - `docker/app/opcache.ini` — opcache
+- `docker/app/xdebug.ini` — xdebug
 
 #### Local
 
@@ -84,9 +81,10 @@ docker-compose up -d
 ```
 - Add DNS records to your local hosts file:
     + `127.0.0.1 <APP_URI> <TRAEFIK_URI> <MAILHOG_UI_URI> <MEILISEARCH_URI> <ELASTICSEARCH_URI>`
+- **!!! ATTENTION !!!** ***All commands in the `app` container should be executed from non-root user `flag`, use `--user=flag` argument for that***
 - Go to the shell of app container by bash command:
   ```shell
-  docker-compose exec app /bin/bash
+  docker-compose exec --user=flag app /bin/bash
   ```
     + Run by bash command
         ```shell
@@ -126,38 +124,32 @@ docker-compose up -d
   ```
 - Administrator panel will be accessed by `<APP_URI>/_admin`, auth as  `<ADMIN_EMAIL>` needed
 
-## Настройка админбара
+## AdminBar setup
 
-Если ваш проект размещён на 35 сервере, то вам достаточно обновить пакет админбара и опубликовать конфиг файл и стили командами:
+- Make sure that .env file on remote host contains following variables :
+    - `GIT_COMMIT=`
+    - `GIT_BRANCH=`
+    - `GIT_DATE=`
 
-`php artisan vendor:publish --tag=NovaAdminBarConfig --force`
+- Make sure that following commands were added to deploy CI/CD stage:
 
-и
-
-`php artisan vendor:publish --tag=NovaAdminBarAssets --force`
-
-Больше вам делать ничего не нужно.
-Но если ваш проект на 188 сервере, то для вывода ветки и коммита вам нужно прокидывать эти данные в CI при выкате в файл .env. Для этого нужно добавить в CI следующие команды:
-
-`sed -i 's/GIT_COMMIT=.*/GIT_COMMIT=\""$CI_COMMIT_MESSAGE"\"/' .env &&`
-
-`sed -i 's/GIT_BRANCH=.*/GIT_BRANCH=\""$CI_COMMIT_BRANCH"\"/' .env &&`
-
-`sed -i 's/GIT_DATE=.*/GIT_DATE=\""$CI_COMMIT_TIMESTAMP"\"/' .env` 
+    - `sed -i 's/GIT_COMMIT=.*/GIT_COMMIT=\""$CI_COMMIT_MESSAGE"\"/' .env &&`
+    - `sed -i 's/GIT_BRANCH=.*/GIT_BRANCH=\""$CI_COMMIT_BRANCH"\"/' .env &&`
+    - `sed -i 's/GIT_DATE=.*/GIT_DATE=\""$CI_COMMIT_TIMESTAMP"\"/' .env` 
 
 ## PreCommit hooks
 
 - If pre-commit hook returns an error message `code style errors`, fix it by bash command and add changes to your commit: 
   ```shell
-  docker-compose exec app vendor/bin/composer csfix
+  docker-compose exec --user=flag app vendor/bin/composer csfix
   ```
 - For the run only `code style` validation use this bash command, Its will returns problem files list: 
   ```shell
-  docker-compose exec app vendor/bin/composer csfix-validate
+  docker-compose exec --user=flag app vendor/bin/composer csfix-validate
   ```
 - If pre_commit hook contains test errors, check that you have local version of phpunit.xml, if not then run a bash command:
   ```shell
-  cp phpunit.dist.xml phpunit.xml
+  cp phpunit.xml.dist phpunit.xml
   ```
 - If pre_commit hook contains test errors, fix the tests and run the test again.
 
@@ -165,7 +157,7 @@ docker-compose up -d
 
 - Run test by bash command 
   ```shell
-  docker-compose exec app composer autotests
+  docker-compose exec --user=flag app composer autotests
   ```
 
 ## Database backups by app itself
@@ -219,7 +211,7 @@ git fetch && git rebase;
   ```
 - You need to provide special environment file for image building. In this example, we are provided `.env.test`
 ```shell
-docker-compose --env-file ./.env.test -f docker-compose.build-app.yml build
+docker-compose --env-file .env.test -f docker-compose.build-app.yml build
 ```
 - Look at build result message, it should be like this:
 ```shell
@@ -235,4 +227,15 @@ docker push registry.gitlab.com/flagstudio/<COMPOSE_PROJECT_NAME>:test
 - Fill required variables
 - Make database backup if needed, do not archive it
 - Make `storage` directory archive if needed;
-- Use [Ansible Deployer](https://gitlab.com/flagstudio/ansible_deployer) for deploy to external server
+- For automated deploy use [Ansible Deployer](https://gitlab.com/flagstudio/ansible_deployer) for deploy to external server
+- For manual deploy
+  - ssh to the remote host
+  - create `www` dir by the command `mkdir -p /root/www`
+  - go to the `www` dir and clone `traefik` repo by command `git clone git@gitlab.com:flagstudio/traefik-staging.git`
+  - follow to the instructions from traefik `readme.md` 
+  - create project dir on remote host, e.g.: `mkdir -P /root/www/project`
+  - copy docker-compose.*.yml file to the remote host as docker-compose.yml
+  - copy .env.* to the remote host as .env
+  - copy `storage` dir if needed
+  - run on the `traefik` container
+  - run on the project by command `docker-compose up -d`

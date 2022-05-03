@@ -1,148 +1,215 @@
-image: docker:latest
+image: docker:19.03.12
 
 variables:
   DOCKER_DRIVER: overlay2
   DOCKER_TLS_CERTDIR: "/certs"
+  DOCKER_IMAGE_PROD: $CI_REGISTRY_IMAGE:prod_$CI_COMMIT_SHORT_SHA
 
-## Uncomment the desired CI stage start sections ##
-#stages:
-#  - build
-#  - deploy
+stages:
+  - build
+  - test
+  - deploy
 
-### MASTER #####################
-#build-master:
-#  stage: build
-#  only:
-#    - master
-#  except:
-#    refs:
-#      - tags
-#    variables:
-#      - $CI_COMMIT_MESSAGE =~ /skip ci/
-#  services:
-#    - docker:dind
-#  before_script:
-#    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" registry.gitlab.com
-#  script:
-#    - docker build --pull -f docker/app/Dockerfile_app_build -t $CI_REGISTRY_IMAGE:prod --build-arg COMPOSE_PROJECT_NAME="$CI_PROJECT_NAME" .
-#    - docker push "$CI_REGISTRY_IMAGE:prod"
-#
-#deploy-master:
-#  stage: deploy
-#  only:
-#    - master
-#  except:
-#    refs:
-#      - tags
-#    variables:
-#      - $CI_COMMIT_MESSAGE =~ /skip ci/
-#  before_script:
-#    - mkdir -p ~/.ssh
-#    - chmod 700 ~/.ssh
-#    - echo "$SSH_PRIVATE_KEY" >> ~/.ssh/id_rsa
-#    - chmod 400 ~/.ssh/id_rsa
-#    - ssh-keyscan -p $PORT_PROD $HOSTNAME_PROD >> ~/.ssh/known_hosts
-#    - chmod 644 ~/.ssh/known_hosts
-#  script:
-#    - scp -P $PORT_PROD docker-compose.prod.yml $USER_PROD@$HOSTNAME_PROD:$PATH_PROD/docker-compose.yml
-#    - ssh -T $USER_PROD@$HOSTNAME_PROD -p $PORT_PROD "cd $PATH_PROD &&
-#      docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" registry.gitlab.com &&
-#      docker pull $CI_REGISTRY_IMAGE:prod &&
-#      sed -i 's/GIT_COMMIT=.*/GIT_COMMIT=\""$CI_COMMIT_SHORT_SHA"\"/' .env &&
-#      sed -i 's/GIT_BRANCH=.*/GIT_BRANCH=\""$CI_COMMIT_BRANCH"\"/' .env &&
-#      sed -i 's/GIT_DATE=.*/GIT_DATE=\""$CI_COMMIT_TIMESTAMP"\"/' .env &&
-#      docker-compose up --remove-orphans -d app &&
-#      docker-compose exec -T app php artisan migrate --force &&
-#      docker image prune --force"
+## Uncomment the desired CI start sections ##
 
-### STAGING PREMASTER #####################
-#build-premaster:
-#  stage: build
-#  only:
-#    - premaster
-#  except:
-#    refs:
-#      - tags
-#    variables:
-#      - $CI_COMMIT_MESSAGE =~ /skip ci/
-#  services:
-#    - docker:dind
-#  before_script:
-#    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" registry.gitlab.com
-#  script:
-#    - docker build --pull -f docker/app/Dockerfile_app_build -t $CI_REGISTRY_IMAGE:premaster --build-arg COMPOSE_PROJECT_NAME="$CI_PROJECT_NAME" .
-#    - docker push "$CI_REGISTRY_IMAGE:premaster"
-#
-#deploy-premaster:
-#  stage: deploy
-#  only:
-#    - premaster
-#  except:
-#    refs:
-#      - tags
-#    variables:
-#      - $CI_COMMIT_MESSAGE =~ /skip ci/
-#  before_script:
-#    - mkdir -p ~/.ssh
-#    - chmod 700 ~/.ssh
-#    - echo "$SSH_PRIVATE_KEY" >> ~/.ssh/id_rsa
-#    - chmod 400 ~/.ssh/id_rsa
-#    - ssh-keyscan -p $PORT_STAGING_PREMASTER $HOSTNAME_STAGING_PREMASTER >> ~/.ssh/known_hosts
-#    - chmod 644 ~/.ssh/known_hosts
-#  script:
-#    - scp -P $PORT_STAGING_PREMASTER docker-compose.premaster.yml $USER_STAGING_PREMASTER@$HOSTNAME_STAGING_PREMASTER:$PATH_STAGING_PREMASTER/docker-compose.yml
-#    - ssh -T $USER_STAGING_PREMASTER@$HOSTNAME_STAGING_PREMASTER -p $PORT_STAGING_PREMASTER "cd $PATH_STAGING_PREMASTER &&
-#      docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" registry.gitlab.com &&
-#      docker pull $CI_REGISTRY_IMAGE:premaster &&
-#      sed -i 's/GIT_COMMIT=.*/GIT_COMMIT=\""$CI_COMMIT_SHORT_SHA"\"/' .env &&
-#      sed -i 's/GIT_BRANCH=.*/GIT_BRANCH=\""$CI_COMMIT_BRANCH"\"/' .env &&
-#      sed -i 's/GIT_DATE=.*/GIT_DATE=\""$CI_COMMIT_TIMESTAMP"\"/' .env &&
-#      docker-compose up --remove-orphans -d app &&
-#      docker-compose exec -T app php artisan migrate --force &&
-#      docker image prune --force"
+## PROD MASTER ONLY BRANCH #####################
+build-master:
+  stage: build
+  only:
+    - master
+  except:
+    refs:
+      - tags
+    variables:
+      - $CI_COMMIT_MESSAGE =~ /skip ci/
+  services:
+    - docker:dind
+  before_script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" registry.gitlab.com
+  script:
+    - docker build --pull -f docker/app/Dockerfile_app_build -t $DOCKER_IMAGE_PROD --build-arg WITH_DEV=true --build-arg NOVA_USERNAME="$NOVA_USERNAME" --build-arg NOVA_PASSWORD="$NOVA_PASSWORD" --build-arg COMPOSE_PROJECT_NAME="$CI_PROJECT_NAME" .
+    - docker push $DOCKER_IMAGE_PROD
+    - dimd=$(docker images | grep prod_$CI_COMMIT_SHORT_SHA | awk '{print $3}'); if [ ! -z "$dimd" ]; then docker rmi -f $dimd; fi
 
-### STAGING TEST #####################
-#build-develop:
-#  stage: build
-#  except:
-#    refs:
-#      - tags
-#      - master
-#      - premaster
-#    variables:
-#      - $CI_COMMIT_MESSAGE =~ /skip ci/
-#  services:
-#    - docker:dind
-#  before_script:
-#    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" registry.gitlab.com
-#  script:
-#    - docker build --pull -f docker/app/Dockerfile_app_build -t $CI_REGISTRY_IMAGE:test --build-arg COMPOSE_PROJECT_NAME="$CI_PROJECT_NAME" .
-#    - docker push "$CI_REGISTRY_IMAGE:test"
-#
-#deploy-develop:
-#  stage: deploy
-#  except:
-#    refs:
-#      - tags
-#      - master
-#      - premaster
-#    variables:
-#      - $CI_COMMIT_MESSAGE =~ /skip ci/
-#  before_script:
-#    - mkdir -p ~/.ssh
-#    - chmod 700 ~/.ssh
-#    - echo "$SSH_PRIVATE_KEY" >> ~/.ssh/id_rsa
-#    - chmod 400 ~/.ssh/id_rsa
-#    - ssh-keyscan -p $PORT_STAGING_TEST $HOSTNAME_STAGING_TEST >> ~/.ssh/known_hosts
-#    - chmod 644 ~/.ssh/known_hosts
-#  script:
-#    - scp -P $PORT_STAGING_TEST docker-compose.test.yml $USER_STAGING_TEST@$HOSTNAME_STAGING_TEST:$PATH_STAGING_TEST/docker-compose.yml
-#    - ssh -T $USER_STAGING_TEST@$HOSTNAME_STAGING_TEST -p $PORT_STAGING_TEST "cd $PATH_STAGING_TEST &&
-#      docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" registry.gitlab.com &&
-#      docker pull $CI_REGISTRY_IMAGE:test &&
-#      sed -i 's/GIT_COMMIT=.*/GIT_COMMIT=\""$CI_COMMIT_SHORT_SHA"\"/' .env &&
-#      sed -i 's/GIT_BRANCH=.*/GIT_BRANCH=\""$CI_COMMIT_BRANCH"\"/' .env &&
-#      sed -i 's/GIT_DATE=.*/GIT_DATE=\""$CI_COMMIT_TIMESTAMP"\"/' .env &&
-#      docker-compose up --remove-orphans -d app &&
-#      docker-compose exec -T app php artisan migrate --force &&
-#      docker image prune --force"
+deploy-master:
+  stage: deploy
+  only:
+    - master
+  except:
+    refs:
+      - tags
+    variables:
+      - $CI_COMMIT_MESSAGE =~ /skip ci/
+  before_script:
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - echo "$SSH_PRIVATE_KEY" >> ~/.ssh/id_rsa
+    - chmod 400 ~/.ssh/id_rsa
+    - ssh-keyscan -p $PORT_PROD $HOSTNAME_PROD >> ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+  script:
+    - scp docker-compose.prod.yml root@$HOSTNAME_PROD:$PATH_PROD/docker-compose.yml
+    - scp .env.example $USER_PROD@$HOSTNAME_PROD:$PATH_PROD/.env.example
+    - ssh -T $USER_PROD@$HOSTNAME_PROD -p $PORT_PROD "cd $PATH_PROD &&
+      sed -i 's/GIT_COMMIT=.*/GIT_COMMIT=\""$CI_COMMIT_SHORT_SHA"\"/' .env &&
+      sed -i 's/GIT_BRANCH=.*/GIT_BRANCH=\""$CI_COMMIT_BRANCH"\"/' .env &&
+      sed -i 's/GIT_DATE=.*/GIT_DATE=\""$CI_COMMIT_TIMESTAMP"\"/' .env &&
+      mkdir -p $PATH_PROD/data/postgres &&
+      mkdir -p $PATH_PROD/data/ms &&
+      mkdir -p $PATH_PROD/data/redis &&
+      chmod -R 0777 $PATH_PROD/data &&
+      docker network inspect $CI_PROJECT_NAME > /dev/null 2>&1 || docker network create --attachable $CI_PROJECT_NAME &&
+      docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" registry.gitlab.com &&
+      docker pull $DOCKER_IMAGE_PROD &&
+      docker-compose up --remove-orphans -d app &&
+      docker rm \$(docker ps -a | grep $CI_REGISTRY_IMAGE:prod_ | grep -v prod_$CI_COMMIT_SHORT_SHA | awk '{print \$1}') || true &&
+      docker rmi -f \$(docker images | grep prod_ | grep -v prod_$CI_COMMIT_SHORT_SHA | awk '{print \$3}') || true &&
+      docker-compose exec -T --user=flag app php artisan migrate --force &&
+      docker-compose exec -T --user=flag app php artisan view:clear &&
+      docker image prune --force &&
+      chmod -R 777 storage/"
+
+test-master:
+  image: $CI_REGISTRY_IMAGE:prod_$CI_COMMIT_SHORT_SHA
+  stage: test-master
+  only:
+    refs:
+      - master
+    variables:
+      - $CI_COMMIT_BRANCH == "master"
+  except:
+    refs:
+      - tags
+    variables:
+      - $CI_COMMIT_MESSAGE =~ /skip ci/
+  services:
+    - name: postgres:13.2-alpine
+      alias: postgrestest
+  variables:
+    POSTGRES_HOST_AUTH_METHOD: trust
+  coverage: '/^\s*Lines:\s*\d+.\d+\%/'
+  before_script:
+    - ls
+  script:
+    - export DB_TEST_HOST=$PG_DB_TEST_HOST
+    - export DB_DATABASE=$PG_DB_DATABASE
+    - export DB_USERNAME=$PG_DB_USERNAME
+    - export DB_PASSWORD=$PG_DB_PASSWORD
+    - export ADMIN_EMAIL=$ADMIN_EMAIL
+    - export ADMIN_PASSWORD=$ADMIN_PASSWORD
+    - pecl install xdebug-3.1.3
+    - docker-php-ext-enable xdebug
+    - cp ./docker/app/xdebug.ini /usr/local/etc/php/conf.d/xdebug.ini
+    - cp phpunit.xml.dist phpunit.xml
+    - composer i -q
+    - cp .env.example .env
+    - php artisan key:generate
+    - vendor/bin/phpunit -d memory_limit=1024M --testdox --coverage-text  --colors=never --exclude-group no-ci
+
+### STAGING PREMASTER ONLY BRANCH #####################
+build-premaster:
+  stage: build
+  only:
+    - premaster
+  except:
+    refs:
+      - tags
+    variables:
+      - $CI_COMMIT_MESSAGE =~ /skip ci/
+  services:
+    - docker:dind
+  before_script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" registry.gitlab.com
+  script:
+    - docker build  --pull -f docker/app/Dockerfile_app_build -t $CI_REGISTRY_IMAGE:premaster --build-arg WITH_DEV=true --build-arg NOVA_USERNAME="$NOVA_USERNAME" --build-arg NOVA_PASSWORD="$NOVA_PASSWORD" --build-arg COMPOSE_PROJECT_NAME="$CI_PROJECT_NAME" .
+    - docker push "$CI_REGISTRY_IMAGE:premaster"
+
+deploy-premaster:
+  stage: deploy
+  only:
+    - premaster
+  except:
+    refs:
+      - tags
+    variables:
+      - $CI_COMMIT_MESSAGE =~ /skip ci/
+  before_script:
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - echo "$SSH_PRIVATE_KEY" >> ~/.ssh/id_rsa
+    - chmod 400 ~/.ssh/id_rsa
+    - ssh-keyscan -p $PORT_PREMASTER $HOSTNAME_PREMASTER >> ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+  script:
+    - scp -P $PORT_PREMASTER docker-compose.premaster.yml $USER_PREMASTER@$HOSTNAME_PREMASTER:$PATH_PREMASTER/docker-compose.yml
+    - scp -P $PORT_PREMASTER .env.example $USER_PREMASTER@$HOSTNAME_PREMASTER:$PATH_PREMASTER/.env.example
+    - ssh -T $USER_PREMASTER@$HOSTNAME_PREMASTER -p $PORT_PREMASTER "cd $PATH_PREMASTER &&
+      mkdir -p $PATH_PREMASTER/data/postgres &&
+      mkdir -p $PATH_PREMASTER/data/ms &&
+      mkdir -p $PATH_PREMASTER/data/redis &&
+      chmod -R 0777 $PATH_PREMASTER/data &&
+      docker network inspect $CI_PROJECT_NAME > /dev/null 2>&1 || docker network create --attachable $CI_PROJECT_NAME &&
+      docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" registry.gitlab.com &&
+      docker pull $CI_REGISTRY_IMAGE:premaster &&
+      sed -i 's/GIT_COMMIT=.*/GIT_COMMIT=\""$CI_COMMIT_SHORT_SHA"\"/' .env &&
+      sed -i 's/GIT_BRANCH=.*/GIT_BRANCH=\""$CI_COMMIT_BRANCH"\"/' .env &&
+      sed -i 's/GIT_DATE=.*/GIT_DATE=\""$CI_COMMIT_TIMESTAMP"\"/' .env &&
+      docker-compose up --remove-orphans -d app &&
+      docker-compose exec -T --user=flag app php artisan migrate --force &&
+      docker-compose exec -T --user=flag app php artisan view:clear &&
+      docker  image prune --force &&
+      chmod -R 777 storage/"
+
+### STAGING DEVELOP & OTHER BRANCHES #####################
+build-develop:
+  stage: build
+  except:
+    refs:
+      - tags
+      - master
+      - premaster
+    variables:
+      - $CI_COMMIT_MESSAGE =~ /skip ci/
+  services:
+    - docker:dind
+  before_script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" registry.gitlab.com
+  script:
+    - docker build  --pull -f docker/app/Dockerfile_app_build -t $CI_REGISTRY_IMAGE:test --build-arg WITH_DEV=true --build-arg NOVA_USERNAME="$NOVA_USERNAME" --build-arg NOVA_PASSWORD="$NOVA_PASSWORD" --build-arg COMPOSE_PROJECT_NAME="$CI_PROJECT_NAME" .
+    - docker push "$CI_REGISTRY_IMAGE:test"
+
+deploy-develop:
+  stage: deploy
+  except:
+    refs:
+      - tags
+      - master
+      - premaster
+    variables:
+      - $CI_COMMIT_MESSAGE =~ /skip ci/
+  before_script:
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - echo "$SSH_PRIVATE_KEY" >> ~/.ssh/id_rsa
+    - chmod 400 ~/.ssh/id_rsa
+    - ssh-keyscan $HOSTNAME_DEVELOP >> ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+  script:
+    - scp docker-compose.test.yml $USER_DEVELOP@$HOSTNAME_DEVELOP:$PATH_DEVELOP/docker-compose.yml
+    - scp .env.example $USER_DEVELOP@$HOSTNAME_DEVELOP:$PATH_DEVELOP/.env.example
+    - ssh -T $USER_DEVELOP@$HOSTNAME_DEVELOP "cd $PATH_DEVELOP &&
+      mkdir -p $PATH_DEVELOP/data/postgres &&
+      mkdir -p $PATH_DEVELOP/data/ms &&
+      mkdir -p $PATH_DEVELOP/data/redis &&
+      chmod -R 0777 $PATH_DEVELOP/data &&
+      docker network inspect $CI_PROJECT_NAME > /dev/null 2>&1 || docker network create --attachable $CI_PROJECT_NAME &&
+      docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" registry.gitlab.com &&
+      docker pull "$CI_REGISTRY_IMAGE:test" &&
+      sed -i 's/GIT_COMMIT=.*/GIT_COMMIT=\""$CI_COMMIT_SHORT_SHA"\"/' .env &&
+      sed -i 's/GIT_BRANCH=.*/GIT_BRANCH=\""$CI_COMMIT_BRANCH"\"/' .env &&
+      sed -i 's/GIT_DATE=.*/GIT_DATE=\""$CI_COMMIT_TIMESTAMP"\"/' .env &&
+      docker-compose up --remove-orphans -d app &&
+      docker-compose exec -T --user=flag app php artisan migrate --force &&
+      docker-compose exec -T --user=flag app php artisan view:clear &&
+      docker image prune --force &&
+      sudo chmod -R 777 storage/"

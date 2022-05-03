@@ -11,10 +11,10 @@ services:
   ### APP (PHP-FPM + NGINX) ##############################################
   app:
     container_name: ${COMPOSE_PROJECT_NAME}_app_prod
-    image: "${IMAGE_REGISTRY_PATH}/${COMPOSE_PROJECT_NAME}:${APP_IMAGE_TAG}"
+    image: ${IMAGE_REGISTRY_PATH}/${REPOSITORY_NAME}:${APP_IMAGE_TAG}_${GIT_COMMIT}
     volumes:
-      - ./.env:/var/www/.env
-      - ./storage:/var/www/storage
+      - ./.env:${DOCKER_SOURCE_CODE_PATH}/.env
+      - ./storage:${DOCKER_SOURCE_CODE_PATH}/storage
     networks:
       - traefik-public
       - ${COMPOSE_PROJECT_NAME}
@@ -39,6 +39,7 @@ services:
     depends_on:
       - postgres
       - redis
+    restart: unless-stopped
 
   ### PostgreSQL ###########################################
   postgres:
@@ -51,9 +52,11 @@ services:
       - POSTGRES_PASSWORD=${DB_PASSWORD}
     volumes:
       - ${DATA_PATH_HOST}/postgres:/var/lib/postgresql/data:delegated
+    ports:
+      - ${DB_EXTERNAL_PORT}:5432
     networks:
       - ${COMPOSE_PROJECT_NAME}
-    restart: always
+    restart: unless-stopped
 
   ### Redis ############################################
   redis:
@@ -64,7 +67,7 @@ services:
       - ${DATA_PATH_HOST}/redis:/data
     networks:
       - ${COMPOSE_PROJECT_NAME}
-    restart: always
+    restart: unless-stopped
 
   ### MySQL ################################################
 #  mysql:
@@ -76,7 +79,9 @@ services:
 #      - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
 #    volumes:
 #      - ${DATA_PATH_HOST}/mysql:/var/lib/mysql:delegated
-#    restart: always
+#    ports:
+#      - ${DB_EXTERNAL_PORT}:3306
+#    restart: unless-stopped
 
   ### Meilisearch ###########################################
 #  meilisearch:
@@ -85,7 +90,6 @@ services:
 #    volumes:
 #      - ${DATA_PATH_HOST}/meilisearch:/data.ms
 #    networks:
-#      - traefik-public
 #      - ${COMPOSE_PROJECT_NAME}
 #    labels:
 #      - traefik.enable=true
@@ -95,7 +99,7 @@ services:
 #      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-search-router.rule=Host(`${MEILISEARCH_URI}`)
 #      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-search.entrypoints=http
 #      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-search-router.service=${COMPOSE_PROJECT_NAME}-search-service
-#    restart: always
+#    restart: unless-stopped
 
   ### ElasticSearch ########################################
 #  elasticsearch:
@@ -106,12 +110,14 @@ services:
 #      - bootstrap.memory_lock=true
 #      - discovery.type=single-node
 #      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+#    ports:
+#      - 9200:9200
+#      - ${ELASTICSEARCH_HOST_HTTP_PORT}:${ELASTICSEARCH_HOST_HTTP_PORT}
 #    ulimits:
 #      memlock:
 #        soft: -1
 #        hard: -1
 #    networks:
-#      - traefik-public
 #      - ${COMPOSE_PROJECT_NAME}
 #    labels:
 #      - traefik.enable=true
@@ -121,4 +127,23 @@ services:
 #      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-elastic-router.rule=Host(`${ELASTICSEARCH_URI}`)
 #      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-elastic.entrypoints=http
 #      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-elastic-router.service=${COMPOSE_PROJECT_NAME}-elastic-service
-#    restart: always
+#    restart: unless-stopped
+
+  ### MailHog ###########################################
+  mailhog:
+    image: mailhog/mailhog
+    logging:
+      driver: 'none'
+    networks:
+      - traefik-public
+      - ${COMPOSE_PROJECT_NAME}
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik-public
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-mailhog-router.middlewares=admin-auth
+
+      - traefik.http.services.${COMPOSE_PROJECT_NAME}-mailhog-service.loadbalancer.server.port=${MAILHOG_UI_PORT}
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-mailhog-router.rule=Host(`${MAILHOG_UI_URI}`)
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-mailhog.entrypoints=http
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-mailhog-router.service=${COMPOSE_PROJECT_NAME}-mailhog-service
+    restart: unless-stopped

@@ -2,6 +2,7 @@ version: '3.5'
 
 services:
   ### Just builds base image for future push to registry ##############################################
+  # docker-compose -f docker-compose.build-base.yml build
   base:
     container_name: ${COMPOSE_PROJECT_NAME}_base
     build:
@@ -13,4 +14,4 @@ services:
         - NODE_VERSION=${NODE_VERSION}
       context: .
       dockerfile: docker/app/Dockerfile_php-fpm_base
-    image: ${IMAGE_REGISTRY_PATH}/${COMPOSE_PROJECT_NAME}:base
+    image: ${IMAGE_REGISTRY_PATH}/${REPOSITORY_NAME}:base

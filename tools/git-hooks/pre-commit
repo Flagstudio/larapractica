@@ -9,18 +9,18 @@ fi
 code_errors=0
 test_errors=0
 
-docker-compose exec -T app vendor/bin/composer csfix-validate
+docker-compose exec -T --user=flag app /usr/bin/composer csfix-validate
 
 if [ "$?" -ne 0 ]; then
     code_errors=1
 fi
 
 if [ "$code_errors" -eq 1 ]; then
-    echo "Code style errors detected! Run 'docker-compose exec app vendor/bin/composer csfix-validate'"
+    echo "Code style errors detected! Run 'docker-compose exec app /usr/bin/composer csfix-validate'"
     exit 1
 fi
 
-docker-compose exec -T app vendor/bin/composer autotests
+docker-compose exec -T --user=flag app /usr/bin/composer autotests
 
 if [ "$?" -ne 0 ]; then
     test_errors=1

@@ -12,12 +12,12 @@ services:
     build:
       args:
         - IMAGE_REGISTRY_PATH=${IMAGE_REGISTRY_PATH}
-        - COMPOSE_PROJECT_NAME=${COMPOSE_PROJECT_NAME}
+        - COMPOSE_PROJECT_NAME=${REPOSITORY_NAME}
       context: .
       dockerfile: docker/app/Dockerfile_app_local
-    image: ${IMAGE_REGISTRY_PATH}/${COMPOSE_PROJECT_NAME}:${APP_IMAGE_TAG}
+    image: ${IMAGE_REGISTRY_PATH}/${REPOSITORY_NAME}:${APP_IMAGE_TAG}
     volumes:
-      - ${PROJECT_SOURCE_CODE_PATH}:/var/www:cached
+      - ${PROJECT_SOURCE_CODE_PATH}:${DOCKER_SOURCE_CODE_PATH}:cached
     networks:
       - ${COMPOSE_PROJECT_NAME}
     labels:

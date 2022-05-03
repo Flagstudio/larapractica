@@ -1,8 +1,8 @@
 # This is app image build in GitLab CI
 ARG IMAGE_REGISTRY_PATH=registry.gitlab.com/flagstudio
-ARG COMPOSE_PROJECT_NAME
+ARG REPOSITORY_NAME
 
-FROM ${IMAGE_REGISTRY_PATH}/${COMPOSE_PROJECT_NAME}:base
+FROM ${IMAGE_REGISTRY_PATH}/${REPOSITORY_NAME}:base
 
 # Start as root
 USER root
@@ -21,21 +21,38 @@ RUN crontab /var/spool/cron/crontabs/root
 # Copy code
 ###########################################################################
 
-USER www-data:www-data
-COPY . /var/www/
-WORKDIR /var/www
-
-USER root
+USER flag
+COPY . /home/flag/www
+WORKDIR /home/flag/www
 
 RUN echo "" >> ~/.bashrc \
     && echo 'export PATH="~/.composer/vendor/bin:$PATH"' >> ~/.bashrc \
-    && mkdir -p /var/www/storage/app/public \
-    /var/www/storage/framework/views \
-    /var/www/storage/framework/cache/data \
-    /var/www/storage/framework/sessions \
-    /var/www/storage/logs \
-    && rm -Rf /var/www/bootstrap/cache/** \
-    && chmod -R 0777 /var/www/storage /var/www/bootstrap
+    && mkdir -p /home/flag/www/storage/app/public \
+    /home/flag/www/storage/framework/views \
+    /home/flag/www/storage/framework/cache/data \
+    /home/flag/www/storage/framework/sessions \
+    /home/flag/www/storage/logs \
+    && rm -Rf /var/www/bootstrap/cache/**
+
+USER root
+RUN chmod -R 0777 /home/flag/www/storage /home/flag/www/bootstrap
+
+###########################################################################
+# Laravel Nova
+###########################################################################
+# Nova CMS credentials
+ARG INSTALL_NOVA=true
+ARG NOVA_USERNAME
+ARG NOVA_PASSWORD
+ENV NOVA_USERNAME=$NOVA_USERNAME
+ENV NOVA_PASSWORD=$NOVA_PASSWORD
+
+USER flag
+
+RUN if [ ${INSTALL_NOVA} = true ]; then \
+    composer global config http-basic.nova.laravel.com ${NOVA_USERNAME} ${NOVA_PASSWORD} \
+    && echo "NOVA CREDENTIALS ARE SETS" \
+;fi
 
 ###########################################################################
 # Composer packages
@@ -64,6 +81,8 @@ RUN npm i \
 RUN php artisan package:discover \
     && php artisan storage:link \
     && php artisan route:cache
+
+USER root
 
 CMD ["/usr/bin/supervisord", "-n", "-c",  "/etc/supervisord.conf"]
 
