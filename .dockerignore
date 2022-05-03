@@ -1,6 +1,10 @@
 .git
 .idea
-# .env
+.vscode
+.vagrant
+.env
+.env.prod
+.env.test
 .babelrc
 .editorconfig
 node_modules
@@ -9,10 +13,35 @@ node_modules
 cghooks.lock
 docker-compose.*
 phpunit.xml
+phpunit.dist.xml
 readme.md
 storage/framework/cache/**
+storage/framework/cache/data/**
 storage/framework/sessions/**
 storage/framework/views/**
-# composer.json
-# composer.lock
-# vendor
+storage/framework/testing/**
+storage/logs/**
+storage/app/public/**
+storage/framework/debugbar/**
+storage/debugbar/**
+storage/app/tmp
+storage/app/ssh_keys
+storage/media-library
+storage/vendor/**
+docker/app/Dockerfile_app_build
+docker/app/Dockerfile_app_local
+docker/app/Dockerfile_php-fpm_base
+docker/mysql/Dockerfile
+patches
+db_backups
+data/minio/data
+data/minio/log
+vendor
+data
+core
+tools/ansible_deployer
+.php-cs-fixer.dist.php
+.php-cs-fixer.php
+.phpstorm.meta.php
+_ide_helper.php
+storage.tar.gz

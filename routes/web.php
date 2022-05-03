@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -13,5 +15,5 @@
 
 Route::view('/', 'main.index')->name('main');
 
-Route::get('robots.txt', 'RobotsController')->name('robots');
-Route::get('sitemap.xml', 'SitemapController')->name('sitemap');
+Route::get('robots.txt', \App\Http\Controllers\RobotsController::class)->name('robots');
+Route::get('sitemap.xml', \App\Http\Controllers\SitemapController::class)->name('sitemap');

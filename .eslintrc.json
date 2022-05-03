@@ -25,6 +25,8 @@
         "linebreak-style": "off",
         "no-plusplus": "off",
         "vue/no-v-html": "off",
+        "no-restricted-syntax": "off",
+        "import/prefer-default-export": "off",
         "vue/html-indent": ["error", 4],
         "indent": ["error", 4],
         "import/extensions": ["error", {
