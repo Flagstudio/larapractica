@@ -6,9 +6,9 @@ variables:
   DOCKER_IMAGE_PROD: $CI_REGISTRY_IMAGE:prod_$CI_COMMIT_SHORT_SHA
 
 stages:
-  - build-master
+  - build
   - test-deploy
-  - deploy
+  #- deploy
 
 ## Uncomment the desired CI start sections ##
 
