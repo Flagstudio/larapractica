@@ -101,6 +101,7 @@ test-master:
     - docker-php-ext-enable xdebug
     - cp ./docker/app/xdebug.ini /usr/local/etc/php/conf.d/xdebug.ini
     - cp phpunit.xml.dist phpunit.xml
+    - su - flag
     - composer i -q
     - cp .env.example .env
     - php artisan key:generate
