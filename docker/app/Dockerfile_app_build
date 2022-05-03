@@ -84,7 +84,7 @@ RUN php artisan package:discover \
 
 USER root
 
-CMD ["/usr/bin/supervisord", "-n", "-c",  "/etc/supervisord.conf"]
+CMD ["sh", "-c", "/usr/bin/supervisord -n -c /etc/supervisord.conf ; su - flag ;"]
 
 EXPOSE 8888 9000
 

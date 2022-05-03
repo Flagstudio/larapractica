@@ -64,7 +64,7 @@ deploy-master:
       docker-compose up --remove-orphans -d app &&
       docker rm \$(docker ps -a | grep $CI_REGISTRY_IMAGE:prod_ | grep -v prod_$CI_COMMIT_SHORT_SHA | awk '{print \$1}') || true &&
       docker rmi -f \$(docker images | grep prod_ | grep -v prod_$CI_COMMIT_SHORT_SHA | awk '{print \$3}') || true &&
-      docker-compose exec -T --user=flag app php artisan migrate --force &&
+      docker-compose exec -T --user=flag app php artisan migrate --force --seed &&
       docker-compose exec -T --user=flag app php artisan view:clear &&
       docker image prune --force &&
       chmod -R 777 storage/"
@@ -155,7 +155,7 @@ test-master:
 #      sed -i 's/GIT_BRANCH=.*/GIT_BRANCH=\""$CI_COMMIT_BRANCH"\"/' .env &&
 #      sed -i 's/GIT_DATE=.*/GIT_DATE=\""$CI_COMMIT_TIMESTAMP"\"/' .env &&
 #      docker-compose up --remove-orphans -d app &&
-#      docker-compose exec -T --user=flag app php artisan migrate --force &&
+#      docker-compose exec -T --user=flag app php artisan migrate --force --seed  &&
 #      docker-compose exec -T --user=flag app php artisan view:clear &&
 #      docker  image prune --force &&
 #      chmod -R 777 storage/"
@@ -209,7 +209,7 @@ test-master:
 #      sed -i 's/GIT_BRANCH=.*/GIT_BRANCH=\""$CI_COMMIT_BRANCH"\"/' .env &&
 #      sed -i 's/GIT_DATE=.*/GIT_DATE=\""$CI_COMMIT_TIMESTAMP"\"/' .env &&
 #      docker-compose up --remove-orphans -d app &&
-#      docker-compose exec -T --user=flag app php artisan migrate --force &&
+#      docker-compose exec -T --user=flag app php artisan migrate --force --seed &&
 #      docker-compose exec -T --user=flag app php artisan view:clear &&
 #      docker image prune --force &&
 #      sudo chmod -R 777 storage/"
