@@ -25,17 +25,18 @@ USER flag
 COPY . /home/flag/www
 WORKDIR /home/flag/www
 
+USER root
 RUN echo "" >> ~/.bashrc \
     && echo 'export PATH="~/.composer/vendor/bin:$PATH"' >> ~/.bashrc \
     && mkdir -p /home/flag/www/storage/app/public \
     /home/flag/www/storage/framework/views \
-    /home/flag/www/storage/framework/cache/data \
     /home/flag/www/storage/framework/sessions \
+    /home/flag/www/storage/framework/cache/data \
     /home/flag/www/storage/logs \
     && rm -Rf /var/www/bootstrap/cache/**
 
-USER root
-RUN chmod -R 0777 /home/flag/www/storage /home/flag/www/bootstrap
+RUN chown -R flag:flag /home/flag/www \
+    && chmod -R 0777 /home/flag/www/storage /home/flag/www/bootstrap
 
 ###########################################################################
 # Laravel Nova
@@ -60,11 +61,10 @@ RUN if [ ${INSTALL_NOVA} = true ]; then \
 
 ARG WITH_DEV=false
 
-RUN if [ ${WITH_DEV} = true ] ; then \
-        composer install --no-interaction --optimize-autoloader; \
-    else \
-        composer install --optimize-autoloader --no-interaction --no-dev --no-scripts; \
-    fi
+ARG WITH_DEV=false
+
+RUN if [ ${WITH_DEV} = true ] ; then composer install --optimize-autoloader ; else composer install --optimize-autoloader --no-dev --no-scripts ; fi
+RUN composer dumpautoload
 
 ###########################################################################
 # NPM
