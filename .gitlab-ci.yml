@@ -27,7 +27,7 @@ build-master:
   before_script:
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" registry.gitlab.com
   script:
-    - docker build --pull -f docker/app/Dockerfile_app_build -t $DOCKER_IMAGE_PROD --build-arg WITH_DEV=true --build-arg NOVA_USERNAME="$NOVA_USERNAME" --build-arg NOVA_PASSWORD="$NOVA_PASSWORD" --build-arg COMPOSE_PROJECT_NAME="$CI_PROJECT_NAME" .
+    - docker build --pull -f docker/app/Dockerfile_app_build -t $DOCKER_IMAGE_PROD --build-arg WITH_DEV=true --build-arg NOVA_USERNAME="$NOVA_USERNAME" --build-arg NOVA_PASSWORD="$NOVA_PASSWORD" --build-arg REPOSITORY_NAME="$CI_PROJECT_NAME" .
     - docker push $DOCKER_IMAGE_PROD
     - dimd=$(docker images | grep prod_$CI_COMMIT_SHORT_SHA | awk '{print $3}'); if [ ! -z "$dimd" ]; then docker rmi -f $dimd; fi
 
