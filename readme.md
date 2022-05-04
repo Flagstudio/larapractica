@@ -8,7 +8,7 @@ Defeloper: [Flag Studio](https://flagstudio.ru)
     + Debian base (registry.gitlab.com/flagstudio/laraflag:base)
     + Node 16.13.1
     + PHP: 8.1.5
-    + Laravel: 8.77.1
+    + Laravel: 9.10.1
     + Laravel nova: 3.30.0
 - postgres (can be swapped to mysql)
     + dockerhub image
