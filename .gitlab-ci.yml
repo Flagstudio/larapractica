@@ -102,6 +102,7 @@ test-master:
     - cp ./docker/app/xdebug.ini /usr/local/etc/php/conf.d/xdebug.ini
     - cp phpunit.xml.dist phpunit.xml
     - cp -R /home/flag/.config /root/.config
+    - cp .env.example .env
     - composer i -q
     - cp .env.example .env
     - php artisan key:generate
