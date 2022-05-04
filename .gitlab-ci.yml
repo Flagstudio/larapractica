@@ -86,6 +86,9 @@ test-master:
     - name: postgres:13.2-alpine
       alias: postgrestest
   variables:
+    POSTGRES_DB: $PG_DB_DATABASE
+    POSTGRES_USER: $PG_DB_USERNAME
+    POSTGRES_PASSWORD: $PG_DB_PASSWORD
     POSTGRES_HOST_AUTH_METHOD: trust
   coverage: '/^\s*Lines:\s*\d+.\d+\%/'
   before_script:
