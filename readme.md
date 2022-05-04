@@ -5,7 +5,7 @@ Defeloper: [Flag Studio](https://flagstudio.ru)
 ## Services:
 
 - app
-    + Debian base (registry.gitlab.com/keeper/base)
+    + Debian base (registry.gitlab.com/flagstudio/laraflag:base)
     + Node 16.13.1
     + PHP: 8.1.5
     + Laravel: 8.77.1
