@@ -4,6 +4,7 @@ const mix = require('laravel-mix');
 const devMode = !mix.inProduction();
 const webpack = require('webpack');
 require('laravel-mix-bundle-analyzer');
+require('laravel-mix-polyfill');
 
 mix
     .ts('resources/js/main.ts', 'public/js')
@@ -15,6 +16,12 @@ mix
     .sass('resources/sass/nova.scss', 'public/css/nova.css')
     .sass('resources/sass/app.scss', 'public/css')
     .sass('resources/sass/components.scss', 'public/css')
+    .polyfill({
+        enabled: true,
+        useBuiltIns: 'entry',
+        targets: '> 1%, last 5 versions, not dead, not IE 11, Safari > 10',
+        corejs: 3,
+    })
     .version()
     .copyDirectory('resources/img', 'public/images')
     .browserSync({

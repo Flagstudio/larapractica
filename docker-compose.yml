@@ -1,7 +1,7 @@
 version: '3.5'
 
 networks:
-  project: # <- change this for COMPOSE_PROJECT_NAME env variable value
+  laraflag: # <- change this for COMPOSE_PROJECT_NAME env variable value
     driver: overlay
     external: true
 
