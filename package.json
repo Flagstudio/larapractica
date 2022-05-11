@@ -5,7 +5,7 @@
         "dev": "npm run pre-run && npm run development",
         "development": "mix",
         "watch": "mix watch",
-        "prod": "npm run pre-run && npm run production",
+        "prod": "npm run production",
         "production": "mix --production",
         "eslint": "eslint 'resources/js/**'",
         "stylelint": "stylelint 'resources/sass/'",

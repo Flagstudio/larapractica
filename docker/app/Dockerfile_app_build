@@ -70,9 +70,10 @@ RUN composer dumpautoload
 # NPM
 ###########################################################################
 
-RUN npm i \
+RUN npm ci \
     && npm run prod \
-    && npm cache clean --force
+    && npm cache clean --force \
+    && rm -rf node_modules/
 
 ###########################################################################
 # Prepare Laravel for Prod
