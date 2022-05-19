@@ -153,6 +153,10 @@ docker-compose up -d
   ```
 - If pre_commit hook contains test errors, fix the tests and run the test again.
 
+## Graylog logging
+
+- Fill in variable `GRAYLOG_HOST_IP` in the `.env.*` file with the server address
+
 ## Tests
 
 - Run test by bash command 

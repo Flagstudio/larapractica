@@ -23,6 +23,7 @@
         "fruitcake/php-cors": "^1.2",
         "gregoriohc/laravel-nova-theme-responsive": "^0.8.1",
         "guzzlehttp/guzzle": "^7.4",
+        "hedii/laravel-gelf-logger": "^7.1",
         "http-interop/http-factory-guzzle": "^1.2",
         "jenssegers/date": "^4.0",
         "laravel/framework": "^9.10",
