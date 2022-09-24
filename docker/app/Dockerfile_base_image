@@ -1,0 +1,204 @@
+ARG PHP_VERSION=8.1.1
+FROM php:${PHP_VERSION}-fpm-buster
+
+# Set Environment Variables
+ENV DEBIAN_FRONTEND noninteractive
+
+#
+#--------------------------------------------------------------------------
+# Software's Installation
+#--------------------------------------------------------------------------
+#
+# Installing tools and PHP extentions using "apt", "docker-php", "pecl",
+#
+
+RUN docker-php-ext-install bcmath \
+    mysqli \
+    exif
+
+RUN set -eux; \
+    apt-get update; \
+    apt-get upgrade -y; \
+    apt-get install -y --no-install-recommends \
+            curl \
+            libmemcached-dev \
+            libz-dev \
+            libpq-dev \
+            libjpeg-dev \
+            libpng-dev \
+            libfreetype6-dev \
+            libssl-dev \
+            libmcrypt-dev \
+            jpegoptim optipng pngquant gifsicle \
+            supervisor \
+            postgresql-client \
+            xvfb libfontconfig wkhtmltopdf \
+            git \
+            cron \
+            libonig-dev; \
+    rm -rf /var/lib/apt/lists/*
+
+RUN set -eux; \
+    # Install the PHP pdo_mysql extention
+    docker-php-ext-install pdo_mysql; \
+    # Install the PHP pdo_pgsql extention
+    docker-php-ext-install pdo_pgsql; \
+    # Install the PHP gd library
+    docker-php-ext-configure gd \
+            --prefix=/usr \
+            --with-jpeg \
+            --with-freetype; \
+    docker-php-ext-install gd; \
+    php -r 'var_dump(gd_info());'
+
+RUN apt-get update;
+
+###########################################################################
+# REDIS:
+###########################################################################
+RUN mkdir -p /usr/src/php/ext/redis; \
+    curl -fsSL --ipv4 https://github.com/phpredis/phpredis/archive/5.3.4.tar.gz | tar xvz -C "/usr/src/php/ext/redis" --strip 1; \
+    docker-php-ext-install redis
+
+
+###########################################################################
+# ZipArchive:
+###########################################################################
+
+RUN apt-get install libzip-dev -y && \
+    docker-php-ext-configure zip && \
+    docker-php-ext-install zip;
+
+
+
+###########################################################################
+# Human Language and Character Encoding Support:
+###########################################################################
+
+
+RUN apt-get install -y zlib1g-dev libicu-dev g++ && \
+    docker-php-ext-configure intl && \
+    docker-php-ext-install intl;
+
+
+
+###########################################################################
+# ImageMagick:
+###########################################################################
+
+USER root
+
+RUN apt update && \
+    apt install -y imagemagick libmagickwand-dev --fix-missing && \
+    pecl install imagick && \
+    docker-php-ext-enable imagick ;
+
+
+
+###########################################################################
+# Caddy:
+###########################################################################
+
+USER root
+COPY ./docker/app/caddy/caddy /usr/bin/caddy
+RUN chmod 0755 /usr/bin/caddy
+
+
+
+############################################################################
+# Composer
+############################################################################
+
+USER root
+
+RUN curl -sS https://getcomposer.org/installer -o composer-setup.php
+RUN php -r "if (hash_file('SHA384', 'composer-setup.php') === '$(curl -sS https://composer.github.io/installer.sig)') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
+RUN php composer-setup.php --version=2.3.0 --install-dir=/usr/local/bin --filename=composer
+
+ARG COMPOSER_REPO_PACKAGIST
+ENV COMPOSER_REPO_PACKAGIST ${COMPOSER_REPO_PACKAGIST}
+
+# Export composer vendor path
+RUN echo "" >> ~/.bashrc && \
+    echo 'export PATH="~/.composer/vendor/bin:$PATH"' >> ~/.bashrc
+# Nova CMS credentials
+ARG NOVA_USERNAME
+ARG NOVA_PASSWORD
+RUN composer global config http-basic.nova.laravel.com ${NOVA_USERNAME} ${NOVA_PASSWORD}
+
+
+
+###########################################################################
+# Node / NVM:
+###########################################################################
+
+# Check if NVM needs to be installed
+ARG NODE_VERSION=12
+ENV NODE_VERSION ${NODE_VERSION}
+ARG INSTALL_NODE=true
+ARG INSTALL_NPM_GULP=false
+ARG INSTALL_NPM_BOWER=false
+ARG INSTALL_NPM_VUE_CLI=false
+ARG NPM_REGISTRY
+ENV NPM_REGISTRY ${NPM_REGISTRY}
+ENV NVM_DIR /home/laradock/.nvm
+
+RUN if [ ${INSTALL_NODE} = true ]; then \
+    # Install nvm (A Node Version Manager)
+    curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.8/install.sh | bash \
+        && . $NVM_DIR/nvm.sh \
+        && nvm install ${NODE_VERSION} \
+        && nvm use ${NODE_VERSION} \
+        && nvm alias ${NODE_VERSION} \
+        && if [ ${NPM_REGISTRY} ]; then \
+        npm config set registry ${NPM_REGISTRY} \
+        ;fi \
+        && if [ ${INSTALL_NPM_GULP} = true ]; then \
+        npm install -g gulp \
+        ;fi \
+        && if [ ${INSTALL_NPM_BOWER} = true ]; then \
+        npm install -g bower \
+        ;fi \
+        && if [ ${INSTALL_NPM_VUE_CLI} = true ]; then \
+        npm install -g @vue/cli \
+        ;fi \
+        && ln -s `npm bin --global` /home/laradock/.node-bin \
+;fi
+
+# Wouldn't execute when added to the RUN statement in the above block
+# Source NVM when loading bash since ~/.profile isn't loaded on non-login shell
+RUN if [ ${INSTALL_NODE} = true ]; then \
+    echo "" >> ~/.bashrc && \
+    echo 'export NVM_DIR="$HOME/.nvm"' >> ~/.bashrc && \
+    echo '[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm' >> ~/.bashrc \
+;fi
+
+# Add NVM binaries to root's .bashrc
+USER root
+
+RUN if [ ${INSTALL_NODE} = true ]; then \
+    echo "" >> ~/.bashrc && \
+    echo 'export NVM_DIR="/home/laradock/.nvm"' >> ~/.bashrc && \
+    echo '[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm' >> ~/.bashrc \
+;fi
+
+# Add PATH for node
+ENV PATH $PATH:/home/laradock/.node-bin
+
+RUN if [ ${NPM_REGISTRY} ]; then \
+    . ~/.bashrc && npm config set registry ${NPM_REGISTRY} \
+;fi
+
+
+#
+## You need to install:
+## configs for php, caddy, supervisor
+## copy projects files inside image
+## composer install (not as easy as it seems
+## cache routes, configs, create storage link
+## run endpoint
+## expose ports
+## So, you need flagstudio/laraflag:latest on gitlab resitry. Ask Misha for more info.
+
+
+
