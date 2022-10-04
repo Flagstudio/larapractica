@@ -21,3 +21,5 @@ Route::get('sitemap.xml', \App\Http\Controllers\SitemapController::class)->name(
 Route::get('/test', function () {
     dd(1569);
 });
+
+Route::view('/search', 'search.index');

@@ -19,18 +19,27 @@
     <link href="{!! mix('/css/components.css') !!}" rel="stylesheet" type="text/css">
     <link href="{!! mix('/css/app.css') !!}" rel="stylesheet" type="text/css">
 
+    <!-- UIkit CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.15.10/dist/css/uikit.min.css" />
+
+    <!-- UIkit JS -->
+    <script src="https://cdn.jsdelivr.net/npm/uikit@3.15.10/dist/js/uikit.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/uikit@3.15.10/dist/js/uikit-icons.min.js"></script>
+
+    @livewireStyles
+
     {!! $headScripts ?? '' !!}
 </head>
 <body>
 
 {!! $beginScripts ?? '' !!}
 
-@if (optional(auth()->user())->isAdmin())
+@if (auth()->user()?->isAdmin())
     {!! AdminBar::generate() !!}
 @endif
 
 <div id="app" class="main-wrapper">
-    <div class="layout">
+    <div class="layout uk-container uk-container-center uk-margin-top uk-margin-large-bottom">
         <header class="header">
 
         </header>
@@ -64,6 +73,8 @@
 @endif
 
 {!! $endScripts ?? '' !!}
+
+@livewireScripts
 
 </body>
 </html>
