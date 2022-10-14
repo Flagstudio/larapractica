@@ -18,13 +18,6 @@
     <link href="{!! mix('/css/components.css') !!}" rel="stylesheet" type="text/css">
     <link href="{!! mix('/css/app.css') !!}" rel="stylesheet" type="text/css">
 
-    <!-- UIkit CSS -->
-{{--    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.15.10/dist/css/uikit.min.css" />--}}
-
-{{--    <!-- UIkit JS -->--}}
-{{--    <script src="https://cdn.jsdelivr.net/npm/uikit@3.15.10/dist/js/uikit.min.js"></script>--}}
-{{--    <script src="https://cdn.jsdelivr.net/npm/uikit@3.15.10/dist/js/uikit-icons.min.js"></script>--}}
-
     {{--    Tailwind ui--}}
     <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -53,14 +46,7 @@
                 </div>
                 <div class="hidden md:block">
                     <div class="ml-4 flex items-center md:ml-6">
-                        <div class="relative mr-3">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
-                            </svg>
-                            <div class="w-6 h-6 bg-white border rounded-full cursor-pointer absolute -top-2 -right-2 text-center bg-rose-400">
-                                3
-                            </div>
-                        </div>
+                        @livewire('cart.mini')
                         <!-- Profile dropdown -->
                         <div class="relative ml-3">
                             <div>

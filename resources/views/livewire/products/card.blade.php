@@ -30,7 +30,10 @@
             @endforeach
         @endif
 
-        <div class="w-8 h-8 border rounded-full cursor-pointer bg-sky-300 flex justify-center items-center">
+        <div
+            wire:click="$emit('addToCart', {{ $product->id }})"
+            class="w-8 h-8 border rounded-full cursor-pointer bg-sky-300 flex justify-center items-center"
+        >
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-6 h-6">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
             </svg>
