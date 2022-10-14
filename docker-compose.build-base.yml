@@ -13,5 +13,5 @@ services:
         - PHP_VERSION=${PHP_VERSION}
         - NODE_VERSION=${NODE_VERSION}
       context: .
-      dockerfile: docker/app/Dockerfile_php-fpm_base
+      dockerfile: docker/app/Dockerfile_base_image
     image: ${IMAGE_REGISTRY_PATH}/${REPOSITORY_NAME}:base
