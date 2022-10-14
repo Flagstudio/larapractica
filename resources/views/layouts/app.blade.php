@@ -5,7 +5,6 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width">
     <meta name="developer" content="flagstudio.ru">
-    <meta name="cmsmagazine" content="3a145314dbb5ea88527bc9277a5f8274">
     <meta name="csrf-token" content="{!! csrf_token() !!}">
 
     @isset($meta)
@@ -20,61 +19,110 @@
     <link href="{!! mix('/css/app.css') !!}" rel="stylesheet" type="text/css">
 
     <!-- UIkit CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.15.10/dist/css/uikit.min.css" />
+{{--    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.15.10/dist/css/uikit.min.css" />--}}
 
-    <!-- UIkit JS -->
-    <script src="https://cdn.jsdelivr.net/npm/uikit@3.15.10/dist/js/uikit.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/uikit@3.15.10/dist/js/uikit-icons.min.js"></script>
+{{--    <!-- UIkit JS -->--}}
+{{--    <script src="https://cdn.jsdelivr.net/npm/uikit@3.15.10/dist/js/uikit.min.js"></script>--}}
+{{--    <script src="https://cdn.jsdelivr.net/npm/uikit@3.15.10/dist/js/uikit-icons.min.js"></script>--}}
+
+    {{--    Tailwind ui--}}
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+    <script src="https://cdn.tailwindcss.com"></script>
 
     @livewireStyles
-
-    {!! $headScripts ?? '' !!}
 </head>
 <body>
 
-{!! $beginScripts ?? '' !!}
+<div class="min-h-full bg-gray-100">
+    <nav class="bg-white shadow-md z-10">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div class="flex h-16 items-center justify-between">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <a href="{{ route('main') }}">
+                            <img class="h-16 w-16" src="{{ asset('images/flag_logo.svg') }}">
+                        </a>
+                    </div>
+                    <div class="hidden md:block">
+                        <div class="ml-10 flex items-baseline space-x-4">
+                            @include('parts.navigation.header-links', ['route' => 'main', 'title' => 'Dashboard'])
+                            @include('parts.navigation.header-links', ['route' => 'search', 'title' => 'Search'])
+                            @include('parts.navigation.header-links', ['route' => 'products', 'title' => 'Products'])
+                        </div>
+                    </div>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-4 flex items-center md:ml-6">
+                        <div class="relative mr-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
+                            </svg>
+                            <div class="w-6 h-6 bg-white border rounded-full cursor-pointer absolute -top-2 -right-2 text-center bg-rose-400">
+                                3
+                            </div>
+                        </div>
+                        <!-- Profile dropdown -->
+                        <div class="relative ml-3">
+                            <div>
+                                <button
+                                    type="button"
+                                    class="flex items-center h-12 w-12 rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 overflow-hidden"
+                                    id="user-menu-button"
+                                    aria-expanded="false"
+                                    aria-haspopup="true"
+                                >
+                                    <img class="h-12 w-12" src="{{ asset('images/profile.jpg') }}" alt="">
+                                </button>
+                            </div>
 
-@if (auth()->user()?->isAdmin())
-    {!! AdminBar::generate() !!}
-@endif
+                            <!--
+                              Dropdown menu, show/hide based on menu state.
 
-<div id="app" class="main-wrapper">
-    <div class="layout uk-container uk-container-center uk-margin-top uk-margin-large-bottom">
-        <header class="header">
+                              Entering: "transition ease-out duration-100"
+                                From: "transform opacity-0 scale-95"
+                                To: "transform opacity-100 scale-100"
+                              Leaving: "transition ease-in duration-75"
+                                From: "transform opacity-100 scale-100"
+                                To: "transform opacity-0 scale-95"
+                            -->
+{{--                            <div class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none" role="menu" aria-orientation="vertical" aria-labelledby="user-menu-button" tabindex="-1">--}}
+{{--                                <!-- Active: "bg-gray-100", Not Active: "" -->--}}
+{{--                                <a href="#" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1" id="user-menu-item-0">Your Profile</a>--}}
 
-        </header>
+{{--                                <a href="#" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1" id="user-menu-item-1">Settings</a>--}}
 
-        @yield('content')
+{{--                                <a href="#" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1" id="user-menu-item-2">Sign out</a>--}}
+{{--                            </div>--}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
 
-    </div>
+    <header>
+        <div class="mx-auto max-w-7xl py-6 px-4 sm:px-6 lg:px-8">
+            <h1 class="text-3xl font-bold tracking-tight text-gray-700">@yield('page_title')</h1>
+        </div>
+    </header>
 
-    <footer class="footer">
-        <personal-warning>
-            Мы используем данные файлы cookie, данные об IP-адресе и местоположении, разработанные третьими лицами для анализа событий на нашем сайте. Продолжая просмотр страниц сайта, вы принимаете условия его использования. Более подробные сведения можно посмотреть в
-            <a class="personal-warning__link" href="#!" target="_blank" title="Политика конфиденциальности">Политике конфиденциальности</a>.
-        </personal-warning>
-    </footer>
+    <main>
+        <div class="mx-auto max-w-7xl sm:px-6 lg:px-8 pb-6">
+            <div class="px-4 sm:px-0">
+                <div class="rounded-lg border-4 border-dashed border-gray-200 mx-auto py-6 px-4">
+                    @yield('content')
+                    {{ $slot ?? null}}
+                </div>
+            </div>
+        </div>
+    </main>
 </div>
-
-<div id="update-warning" class="update-warning" style="display: none">
-    <p data-nosnippet>Вы пользуетесь устаревшей версией браузера. Данная версия браузера не поддерживает многие современные технологии, из-за чего страницы отображаются некорректно, а главное — на сайте могут работать не все функции.<br> Рекомендуем установить <a href="https://www.google.com/chrome/" target="_blank" rel="nofollow noopener">Google Chrome</a> — современный, быстрый и безопасный браузер.</p>
-    <button class="update-warning__close js--close-update-warning" type="button">Закрыть</button>
-</div>
-
-@include('sprite')
 
 <script src="{!! mix('/js/check-support.js') !!}"></script>
 <script src="{!! mix('/js/manifest.js') !!}"></script>
 <script src="{!! mix('/js/vendor.js') !!}"></script>
 <script src="{!! mix('/js/main.js') !!}"></script>
 
-@if(! app()->environment('local') && config('app.jira_collector_id') && optional(auth()->user())->isAdmin())
-    <script type="text/javascript" src="https://jira.flagstudio.ru/s/95ad89360eec1845f13b7a13ded5c0c4-T/-y6xh9q/73015/19eec8c46095745849ebdd927f182f88/2.0.23/_/download/batch/com.atlassian.jira.collector.plugin.jira-issue-collector-plugin:issuecollector/com.atlassian.jira.collector.plugin.jira-issue-collector-plugin:issuecollector.js?locale=ru-RU&collectorId={{ config('app.jira_collector_id') }}"></script>
-@endif
-
-{!! $endScripts ?? '' !!}
-
 @livewireScripts
-
 </body>
 </html>

@@ -18,8 +18,8 @@ Route::view('/', 'main.index')->name('main');
 Route::get('robots.txt', \App\Http\Controllers\RobotsController::class)->name('robots');
 Route::get('sitemap.xml', \App\Http\Controllers\SitemapController::class)->name('sitemap');
 
-Route::get('/test', function () {
-    dd(1569);
-});
+Route::view('/search', 'search.index')
+    ->name('search');
 
-Route::view('/search', 'search.index');
+Route::get('/products', \App\Http\Livewire\Products\Filters::class)
+    ->name('products');

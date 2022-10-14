@@ -1,8 +1,10 @@
 @extends('layouts.app')
+@section('page_title', 'Dashboard')
+
 @section('content')
 
-<div id="main" class="main" role="main">
-
+<div>
+    <p>main page</p>
 </div>
 
 @endsection
