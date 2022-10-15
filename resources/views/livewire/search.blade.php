@@ -19,7 +19,8 @@
                 </a>
             </div>
         @endforeach
-        @if($products && $query)
+
+        @if(count($products) === 0 && !empty($query))
             <p>Ничего не найдено</p>
         @endif
     </div>
