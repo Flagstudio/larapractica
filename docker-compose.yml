@@ -107,6 +107,7 @@ services:
       - "127.0.0.1:${DB_PORT}:5432"
     networks:
       - ${COMPOSE_PROJECT_NAME}
+    restart: unless-stopped
 
   ### Redis ###########################################
   redis:
@@ -117,4 +118,22 @@ services:
       - ${DATA_PATH_HOST}/redis:/data
     networks:
       - ${COMPOSE_PROJECT_NAME}
-    restart: always
+    restart: unless-stopped
+
+### Meilisearch ###########################################
+  meilisearch:
+    container_name: ${COMPOSE_PROJECT_NAME}_meilisearch
+    image: getmeili/meilisearch:v0.24.0
+    volumes:
+      - ${DATA_PATH_HOST}/meilisearch:/data.ms
+    networks:
+      - ${COMPOSE_PROJECT_NAME}
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=${COMPOSE_PROJECT_NAME}
+
+      - traefik.http.services.${COMPOSE_PROJECT_NAME}-search-service.loadbalancer.server.port=${MEILISEARCH_PORT}
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-search-router.rule=Host(`${MEILISEARCH_URI}`)
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-search.entrypoints=http
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-search-router.service=${COMPOSE_PROJECT_NAME}-search-service
+    restart: unless-stopped
