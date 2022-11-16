@@ -14,6 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::create('color_product', function (Blueprint $table) {
+            $table->id();
             $table->foreignId('color_id')->constrained()->cascadeOnDelete();
             $table->foreignId('product_id')->constrained()->cascadeOnDelete();
         });

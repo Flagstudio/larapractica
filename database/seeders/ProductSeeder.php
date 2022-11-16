@@ -2,19 +2,18 @@
 
 namespace Database\Seeders;
 
+use App\Models\ColorProduct;
 use App\Models\Product;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class ProductSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     *
-     * @return void
-     */
-    public function run()
+    public function run(): void
     {
+//        DB::beginTransaction();
+
         $products = [
             [
                 'title' => 'Стеллаж Кринум',
@@ -102,11 +101,15 @@ class ProductSeeder extends Seeder
             ]);
 
             $model->colors()->sync($product['colors']);
+//            $model->refresh();
 
-            foreach($product['image'] as $image) {
-                $model->addMedia(resource_path('img/' . $image))
-                    ->toMediaCollection(Product::MEDIA_IMAGES);
+            foreach($model->colors as $key => $color) {
+//                dd($color->pivot->getKey());
+                $color->pivot->addMedia(resource_path('img/' . $product['image'][$key]))
+                    ->toMediaCollection(ColorProduct::MEDIA_IMAGES);
             }
         }
+
+//        DB::commit();
     }
 }

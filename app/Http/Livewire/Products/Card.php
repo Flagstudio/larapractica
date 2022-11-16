@@ -16,6 +16,7 @@ class Card extends Component
 
     public function mount(Product $product): void
     {
+        dd($product);
         $this->product = $product;
         $this->colorsList = $product->colors->pluck('id')->toArray();
         $this->viewImage = $product->getFirstMediaUrl('images');
