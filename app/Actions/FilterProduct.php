@@ -29,6 +29,11 @@ class FilterProduct
                 $options['filter'] .= implode(' OR ', $colorFilter) .  ') ';
             }
 
+            $options['facets'] = [
+                'properties.category',
+                'properties.colors',
+            ];
+
             return $meiliSearch->search( $query, $options );
         })
             ->paginate();
