@@ -23,6 +23,11 @@ class Product extends Model
     {
         return [
             'title' => $this->title,
+            'colors' => $this->colors
+                ->pluck('id')
+                ->toArray(),
+            'category' => $this->category_id,
+            'price' => $this->price,
         ];
     }
 }
