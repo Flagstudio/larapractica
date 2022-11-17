@@ -12,8 +12,6 @@ class ColorProduct extends Pivot implements HasMedia
     use HasFactory;
     use InteractsWithMedia;
 
-    protected $primaryKey = 'id';
-
     public function getKey()
     {
         return $this->primaryKey;

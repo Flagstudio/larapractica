@@ -33,7 +33,7 @@ class Filters extends Component
 
     public function render(): View
     {
-        $products = Product::with('media', 'colors')
+        $products = Product::with('colors')
             ->when($this->colors, function ($query) {
                 $query->whereHas('colors', function ($query) {
                     $query->whereIn('id', $this->colors);

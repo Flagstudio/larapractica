@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire\Products;
 
+use App\Models\ColorProduct;
 use App\Models\Product;
 use Illuminate\View\View;
 use Livewire\Component;
@@ -16,10 +17,13 @@ class Card extends Component
 
     public function mount(Product $product): void
     {
-        dd($product);
         $this->product = $product;
         $this->colorsList = $product->colors->pluck('id')->toArray();
-        $this->viewImage = $product->getFirstMediaUrl('images');
+        $this->viewImage = $product->colors()
+            ->withPivot('id')
+            ->first()
+            ->pivot
+            ->getFirstMediaUrl(ColorProduct::MEDIA_IMAGES);
     }
 
     public function render(): View
@@ -29,9 +33,10 @@ class Card extends Component
 
     public function chooseColor(int $id): void
     {
-        $this->viewImage = $this->product->getMedia('images')
-            ->slice(array_flip($this->colorsList)[$id])
-            ->first()
-            ->getUrl();
+        $this->viewImage = $this->product->colors()
+            ->withPivot('id')
+            ->find($id)
+            ->pivot
+            ->getFirstMediaUrl(ColorProduct::MEDIA_IMAGES);
     }
 }

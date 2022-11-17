@@ -23,6 +23,7 @@ class Color extends Model implements HasMedia
 
     public function products(): BelongsToMany
     {
-        return $this->belongsToMany(Product::class);
+        return $this->belongsToMany(Product::class)
+            ->using(ColorProduct::class);
     }
 }

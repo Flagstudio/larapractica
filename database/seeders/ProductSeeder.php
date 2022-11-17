@@ -5,15 +5,12 @@ namespace Database\Seeders;
 use App\Models\ColorProduct;
 use App\Models\Product;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class ProductSeeder extends Seeder
 {
     public function run(): void
     {
-//        DB::beginTransaction();
-
         $products = [
             [
                 'title' => 'Стеллаж Кринум',
@@ -101,15 +98,15 @@ class ProductSeeder extends Seeder
             ]);
 
             $model->colors()->sync($product['colors']);
-//            $model->refresh();
+            $model->refresh();
 
             foreach($model->colors as $key => $color) {
-//                dd($color->pivot->getKey());
-                $color->pivot->addMedia(resource_path('img/' . $product['image'][$key]))
+                ColorProduct::where('product_id', $color->pivot->product_id)
+                    ->where('color_id', $color->pivot->color_id)
+                    ->first()
+                    ->addMedia(resource_path('img/' . $product['image'][$key]))
                     ->toMediaCollection(ColorProduct::MEDIA_IMAGES);
             }
         }
-
-//        DB::commit();
     }
 }
