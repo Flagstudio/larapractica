@@ -10,16 +10,29 @@ class FilterProduct
 {
     public function handle(FilterProductDTO $data)
     {
-        return Product::search(
-            '',
-//            function(Indexes $meiliSearch, string $query, array $options) use ($data) {
-//                $options['sort'] = ['id:asc'];
-//
-//                return $meiliSearch->search($query, $options);
-//            }
-        )
-//            ->query()
-//            ->with('colors')
+        return Product::search('', function(Indexes $meiliSearch, string $query, array $options) use ($data){
+            $options['sort'] = ['id:asc'];
+            $options['filter'] = 'price >= ' . $data->priceMin . ' AND price <= ' . $data->priceMax;
+
+            if($data->category) {
+                $options['filter'] .= ' AND category = ' . $data->category;
+            }
+
+            if($data->colors) {
+                $options['filter'] .= ' AND (';
+
+                $colorFilter = [];
+                foreach($data->colors as $color) {
+                    $colorFilter[] = 'colors = ' . $color;
+                }
+
+                $options['filter'] .= implode(' OR ', $colorFilter) .  ') ';
+            }
+
+            return $meiliSearch->search( $query, $options );
+        })
+            ->paginate();
+//        return Product::with('colors')
 //            ->when($data->colors, function ($query) use ($data) {
 //                $query->whereHas('colors', function ($query) use ($data) {
 //                    $query->whereIn('colors.id', $data->colors);
@@ -30,6 +43,6 @@ class FilterProduct
 //            })
 //            ->where('price', '>=', $data->priceMin)
 //            ->where('price', '<=', $data->priceMax)
-            ->paginate();
+//            ->paginate();
     }
 }

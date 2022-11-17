@@ -12,6 +12,24 @@ class Product extends Model
     use HasFactory;
     use Searchable;
 
+    public $sortable = [
+        'order_column_name' => 'id',
+        'sort_when_creating' => true,
+        'ignore_policies' => true,
+        'sort_on_has_many' => true,
+        'sort_on_index' => true,
+    ];
+
+    public const SORTABLE = [
+        'id',
+    ];
+
+    public const FILTERABLE = [
+        'colors',
+        'category',
+        'price',
+    ];
+
     public function colors(): BelongsToMany
     {
         return $this->belongsToMany(Color::class)
@@ -29,5 +47,10 @@ class Product extends Model
             'category' => $this->category_id,
             'price' => $this->price,
         ];
+    }
+
+    public function shouldBeSearchable()
+    {
+        return $this->has('colors');
     }
 }
