@@ -2,7 +2,7 @@
 
 namespace App\Http\Livewire;
 
-use App\Models\Product;
+use App\Actions\SearchProduct;
 use Illuminate\View\View;
 use Livewire\Component;
 
@@ -10,11 +10,9 @@ class Search extends Component
 {
     public string $query = '';
 
-    public function render(): View
+    public function render(SearchProduct $action): View
     {
-        $products = $this->query !== ''
-            ? Product::search($this->query)->get()
-            : [];
+        $products = $action->handle($this->query);
 
         return view(
             'livewire.search',

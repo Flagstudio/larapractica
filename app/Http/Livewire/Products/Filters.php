@@ -2,6 +2,8 @@
 
 namespace App\Http\Livewire\Products;
 
+use App\Actions\FilterProduct;
+use App\DTO\FilterProductDTO;
 use App\Models\Category;
 use App\Models\Color;
 use App\Models\Product;
@@ -31,20 +33,16 @@ class Filters extends Component
         $this->priceMax = Product::latest('price')->first()->price;
     }
 
-    public function render(): View
+    public function render(FilterProduct $action): View
     {
-        $products = Product::with('colors')
-            ->when($this->colors, function ($query) {
-                $query->whereHas('colors', function ($query) {
-                    $query->whereIn('id', $this->colors);
-                });
-            })
-            ->when($this->category, function ($query) {
-                $query->whereCategoryId($this->category);
-            })
-            ->where('price', '>=', $this->priceMin)
-            ->where('price', '<=', $this->priceMax)
-            ->get();
+        $products = $action->handle(
+            new FilterProductDTO(
+                colors: $this->colors,
+                category: $this->category,
+                priceMin: $this->priceMin,
+                priceMax: $this->priceMax,
+            ),
+        );
 
         return view(
             'livewire.products.filters',

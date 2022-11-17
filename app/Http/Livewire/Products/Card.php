@@ -20,10 +20,10 @@ class Card extends Component
         $this->product = $product;
         $this->colorsList = $product->colors->pluck('id')->toArray();
         $this->viewImage = $product->colors()
-            ->withPivot('id')
             ->first()
-            ->pivot
-            ->getFirstMediaUrl(ColorProduct::MEDIA_IMAGES);
+            ?->pivot
+            ->getFirstMediaUrl(ColorProduct::MEDIA_IMAGES)
+            ?? '';
     }
 
     public function render(): View
@@ -34,9 +34,9 @@ class Card extends Component
     public function chooseColor(int $id): void
     {
         $this->viewImage = $this->product->colors()
-            ->withPivot('id')
             ->find($id)
-            ->pivot
-            ->getFirstMediaUrl(ColorProduct::MEDIA_IMAGES);
+            ?->pivot
+            ->getFirstMediaUrl(ColorProduct::MEDIA_IMAGES)
+            ?? '';
     }
 }

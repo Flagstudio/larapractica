@@ -128,6 +128,8 @@ services:
       - ${DATA_PATH_HOST}/meilisearch:/data.ms
     networks:
       - ${COMPOSE_PROJECT_NAME}
+    ports:
+      - 127.0.0.1:${MEILISEARCH_PORT}:7700
     labels:
       - traefik.enable=true
       - traefik.docker.network=${COMPOSE_PROJECT_NAME}
