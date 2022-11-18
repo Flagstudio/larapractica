@@ -28,7 +28,8 @@ class Product extends Model
     {
         return $this->belongsToMany(Color::class)
             ->withPivot('id')
-            ->using(ColorProduct::class);
+            ->using(ColorProduct::class)
+            ->as('colorProduct');
     }
 
     public function toSearchableArray()

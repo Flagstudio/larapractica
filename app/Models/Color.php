@@ -16,6 +16,7 @@ class Color extends Model
     {
         return $this->belongsToMany(Product::class)
             ->withPivot('id')
-            ->using(ColorProduct::class);
+            ->using(ColorProduct::class)
+            ->as('colorProduct');
     }
 }

@@ -32,7 +32,7 @@ class FilterProduct
             ->paginateRaw()
             ->items();
 
-        $products = Product::with('colors.pivot.media')
+        $products = Product::with('colors.colorProduct.media')
             ->find(
                 array_column(
                     $searchResult['hits'],
