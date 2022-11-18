@@ -12,14 +12,6 @@ class Product extends Model
     use HasFactory;
     use Searchable;
 
-    public $sortable = [
-        'order_column_name' => 'id',
-        'sort_when_creating' => true,
-        'ignore_policies' => true,
-        'sort_on_has_many' => true,
-        'sort_on_index' => true,
-    ];
-
     public const SORTABLE = [
         'id',
     ];

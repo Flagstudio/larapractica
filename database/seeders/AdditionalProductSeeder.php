@@ -14,20 +14,19 @@ class AdditionalProductSeeder extends Seeder
         $colors = Color::all();
         $categories = Category::all();
 
-        $products = collect();
+        $firstKey = Product::latest()->first()->id;
+        $lastKey = $firstKey + 3000;
 
-        foreach(range(19002, 100000) as $i) {
-            $products->push(
-                Product::factory()
-                    ->make([
-                        'title' => 'unique' . $i,
-                        'slug' => 'unique' . $i,
-                        'category_id' => $categories->random(),
-                    ])
-            );
+        foreach(range($firstKey, $lastKey) as $i) {
+            $product = Product::factory()
+                ->create([
+                    'title' => 'unique' . $i,
+                    'slug' => 'unique' . $i,
+                    'category_id' => $categories->random(),
+                ]);
+
+            $product->colors()
+                ->sync($colors->random(rand(1, 5)));
         }
-
-        $products->chunk(1000)
-            ->each(fn ($productItems) => Product::insert($productItems->toArray()));
     }
 }

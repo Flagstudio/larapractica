@@ -19,7 +19,7 @@ class Card extends Component
     {
         $this->product = $product;
         $this->colorsList = $product->colors->pluck('id')->toArray();
-        $this->viewImage = $product->colors()
+        $this->viewImage = $product->colors
             ->first()
             ?->pivot
             ->getFirstMediaUrl(ColorProduct::MEDIA_IMAGES)

@@ -35,7 +35,7 @@ class Filters extends Component
 
     public function render(FilterProduct $action): View
     {
-        $products = $action->handle(
+        $filteredProduct = $action->handle(
             new FilterProductDTO(
                 colors: $this->colors,
                 category: $this->category,
@@ -44,10 +44,16 @@ class Filters extends Component
             ),
         );
 
+        $products = $filteredProduct->products;
+
+        $facetColors = $filteredProduct->facets['colors'] ?? [];
+        $this->colorsList->each(fn ($color) => $color->facet = $facetColors[$color->id]);
+
         return view(
             'livewire.products.filters',
             compact(
                 'products',
+                'facetColors',
             ),
         );
     }

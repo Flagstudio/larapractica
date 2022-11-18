@@ -38,7 +38,12 @@
                         >
                     </div>
                     <div class="ml-3 text-sm">
-                        <label for="comments" class="font-medium text-gray-700">{{ $color->title }}</label>
+                        <label for="comments" class="font-medium text-gray-700">
+                            {{ $color->title }}
+                            <span>
+                                ({{ $color->facet }})
+                            </span>
+                        </label>
                     </div>
                 </div>
             @endforeach
