@@ -19,7 +19,7 @@ class FilterProduct
     {
         $searchResult = Product::search(
             '',
-            function(Indexes $meiliSearch, string $query, array $options) use ($data){
+            function(Indexes $meiliSearch, string $query, array $options) use ($data) {
                 $options['sort'] = self::DEFAULT_SORT;
                 $options['facetsDistribution'] = self::FACETS_DISTRIBUTION;
 
@@ -32,7 +32,7 @@ class FilterProduct
             ->paginateRaw()
             ->items();
 
-        $products = Product::with('colors')
+        $products = Product::with('colors.pivot.media')
             ->find(
                 array_column(
                     $searchResult['hits'],

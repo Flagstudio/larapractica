@@ -9,6 +9,7 @@
         "ext-json": "*",
         "ext-redis": "*",
         "64robots/nova-fields": "^0.22.0",
+        "ajcastro/eager-load-pivot-relations": "^0.3.0",
         "ampeco/nova-date-range-filter": "^0.1.3",
         "ebess/advanced-nova-media-library": "3.8.0",
         "emilianotisato/nova-tinymce": "^2.0",

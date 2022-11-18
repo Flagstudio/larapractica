@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use AjCastro\EagerLoadPivotRelations\EagerLoadPivotTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -11,6 +12,7 @@ class Product extends Model
 {
     use HasFactory;
     use Searchable;
+    use EagerLoadPivotTrait;
 
     public const SORTABLE = [
         'id',

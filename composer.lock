@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3662b79e357e6c668cfe8a908b00f3ab",
+    "content-hash": "bad8dfca0d9175565bf5bc3ceb0565f1",
     "packages": [
         {
             "name": "64robots/nova-fields",
@@ -56,6 +56,58 @@
                 }
             ],
             "time": "2021-08-13T13:00:45+00:00"
+        },
+        {
+            "name": "ajcastro/eager-load-pivot-relations",
+            "version": "v0.3.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ajcastro/eager-load-pivot-relations.git",
+                "reference": "e7e27ce2fe68822d1c31ff2cfcdde679e85f166d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ajcastro/eager-load-pivot-relations/zipball/e7e27ce2fe68822d1c31ff2cfcdde679e85f166d",
+                "reference": "e7e27ce2fe68822d1c31ff2cfcdde679e85f166d",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.6.0"
+            },
+            "require-dev": {
+                "laravel/framework": ">= 5.0.0",
+                "laravel/legacy-factories": ">= 1.0.0",
+                "orchestra/testbench": ">= 3.0.0",
+                "phpunit/phpunit": ">= 6.0.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [],
+                    "aliases": []
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "AjCastro\\EagerLoadPivotRelations\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Arjon Jason Castro",
+                    "email": "ajcastro29@gmail.com"
+                }
+            ],
+            "description": "Eager load pivot relations for Laravel Eloquent's BelongsToMany relation.",
+            "support": {
+                "issues": "https://github.com/ajcastro/eager-load-pivot-relations/issues",
+                "source": "https://github.com/ajcastro/eager-load-pivot-relations/tree/v0.3.0"
+            },
+            "time": "2022-11-02T13:31:59+00:00"
         },
         {
             "name": "ampeco/nova-date-range-filter",
