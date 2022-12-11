@@ -14,6 +14,7 @@ class ProductSeeder extends Seeder
         $products = [
             [
                 'title' => 'Стеллаж Кринум',
+                'description' => '',
                 'category_id' => 3,
                 'price' => 2000,
                 'colors' => [1],
@@ -21,6 +22,7 @@ class ProductSeeder extends Seeder
             ],
             [
                 'title' => 'Стеллаж Тумба Лаки',
+                'description' => '',
                 'category_id' => 3,
                 'price' => 4000,
                 'colors' => [1],
@@ -28,6 +30,7 @@ class ProductSeeder extends Seeder
             ],
             [
                 'title' => 'Стеллаж модульный',
+                'description' => '',
                 'category_id' => 3,
                 'price' => 2300,
                 'colors' => [1],
@@ -35,6 +38,7 @@ class ProductSeeder extends Seeder
             ],
             [
                 'title' => 'Стеллаж Zett',
+                'description' => '',
                 'category_id' => 3,
                 'price' => 3500,
                 'colors' => [1,3,4,5],
@@ -47,6 +51,7 @@ class ProductSeeder extends Seeder
             ],
             [
                 'title' => 'Офисное кресло',
+                'description' => '',
                 'category_id' => 2,
                 'price' => 12300,
                 'colors' => [6],
@@ -54,6 +59,7 @@ class ProductSeeder extends Seeder
             ],
             [
                 'title' => 'Офисное кресло с подлокотниками',
+                'description' => '',
                 'category_id' => 2,
                 'price' => 21500,
                 'colors' => [7],
@@ -61,6 +67,7 @@ class ProductSeeder extends Seeder
             ],
             [
                 'title' => 'Письменный стол',
+                'description' => '',
                 'category_id' => 1,
                 'price' => 2700,
                 'colors' => [1,3,7],
@@ -72,6 +79,7 @@ class ProductSeeder extends Seeder
             ],
             [
                 'title' => 'Письменный стол с надстройкой',
+                'description' => '',
                 'category_id' => 1,
                 'price' => 3200,
                 'colors' => [3],
@@ -79,6 +87,7 @@ class ProductSeeder extends Seeder
             ],
             [
                 'title' => 'Журнальный стол',
+                'description' => '',
                 'category_id' => 1,
                 'price' => 1800,
                 'colors' => [1,4],
@@ -101,8 +110,8 @@ class ProductSeeder extends Seeder
             $model->refresh();
 
             foreach($model->colors as $key => $color) {
-                ColorProduct::where('product_id', $color->pivot->product_id)
-                    ->where('color_id', $color->pivot->color_id)
+                ColorProduct::where('product_id', $color->colorProduct->product_id)
+                    ->where('color_id', $color->colorProduct->color_id)
                     ->first()
                     ->addMedia(resource_path('img/' . $product['image'][$key]))
                     ->toMediaCollection(ColorProduct::MEDIA_IMAGES);

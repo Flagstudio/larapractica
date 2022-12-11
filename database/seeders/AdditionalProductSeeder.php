@@ -14,8 +14,8 @@ class AdditionalProductSeeder extends Seeder
         $colors = Color::all();
         $categories = Category::all();
 
-        $firstKey = Product::latest()->first()->id;
-        $lastKey = $firstKey + 3000;
+        $firstKey = Product::latest('id')->first()->id;
+        $lastKey = $firstKey + 15000;
 
         foreach(range($firstKey, $lastKey) as $i) {
             $product = Product::factory()

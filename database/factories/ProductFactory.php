@@ -19,6 +19,7 @@ class ProductFactory extends Factory
         return [
             'title' => $this->faker->title,
             'slug' => $this->faker->slug,
+            'description' => $this->faker->realText,
             'price' => $this->faker->numberBetween(100, 999999),
         ];
     }

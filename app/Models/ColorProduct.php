@@ -16,11 +16,6 @@ class ColorProduct extends Pivot implements HasMedia
         'media',
     ];
 
-    public function getKey()
-    {
-        return $this->primaryKey;
-    }
-
     public const MEDIA_IMAGES = 'images';
 
     public function registerMediaCollections(): void
