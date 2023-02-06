@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\CartController;
+use App\Http\Controllers\CartItemController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -13,11 +15,11 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::view('/', 'main.index')->name('main');
+Route::get('/cart', [CartController::class, 'index'])
+    ->name('cart');
 
-Route::get('robots.txt', \App\Http\Controllers\RobotsController::class)->name('robots');
-Route::get('sitemap.xml', \App\Http\Controllers\SitemapController::class)->name('sitemap');
+Route::post('/cart', [CartItemController::class, 'create'])
+    ->name('cart.addItem');
 
-Route::get('/test', function () {
-    dd(1569);
-});
+Route::delete('/cart/{product}', [CartItemController::class, 'delete'])
+    ->name('cart.removeItem');
