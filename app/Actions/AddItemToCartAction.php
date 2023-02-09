@@ -5,11 +5,16 @@ namespace App\Actions;
 use App\Data\AddToCartData;
 use App\Exceptions\InsufficientQuantityProductException;
 use App\Models\Product;
+use App\Services\CartService;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Log;
 
 class AddItemToCartAction
 {
+    public function __construct(
+        private CartService $cart,
+    ) {}
+
     public function run(AddToCartData $data): void
     {
         try {
@@ -21,21 +26,15 @@ class AddItemToCartAction
                 throw new InsufficientQuantityProductException();
             }
 
-            $productsInCart = Session::get('productsInCart', []);
-
-            if (isset($productsInCart[$data->productId])) {
-                $productsInCart[$data->productId] += $data->quantity;
-            } else {
-                $productsInCart[$data->productId] = $data->quantity;
-            }
-
-            Session::put('productsInCart', $productsInCart);
+            $this->cart->addProduct($product, $data->quantity);
 
             $product->decrement('quantity', $data->quantity);
 
             DB::commit();
-        } catch (\Exception) {
+        } catch (\Exception $e) {
             DB::rollBack();
+
+            Log::error($e->getMessage());
         }
     }
 }

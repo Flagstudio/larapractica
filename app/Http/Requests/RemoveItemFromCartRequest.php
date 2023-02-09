@@ -2,10 +2,15 @@
 
 namespace App\Http\Requests;
 
+use App\Data\RemoveFromCartData;
 use Illuminate\Foundation\Http\FormRequest;
+use Spatie\LaravelData\WithData;
 
 class RemoveItemFromCartRequest extends FormRequest
 {
+    use WithData;
+
+    protected $dataClass = RemoveFromCartData::class;
     /**
      * Determine if the user is authorized to make this request.
      *

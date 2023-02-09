@@ -34,9 +34,4 @@ class AddItemToCartRequest extends FormRequest
             'quantity' => 'required|integer',
         ];
     }
-
-    protected function dataClass(): string
-    {
-        return AddToCartData::class;
-    }
 }

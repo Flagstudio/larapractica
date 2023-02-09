@@ -4,11 +4,16 @@ namespace App\Actions;
 
 use App\Data\RemoveFromCartData;
 use App\Models\Product;
+use App\Services\CartService;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Log;
 
 class RemoveItemFromCartAction
 {
+    public function __construct(
+        private CartService $cart,
+    ) {}
+
     public function run(RemoveFromCartData $data): void
     {
         try {
@@ -16,18 +21,16 @@ class RemoveItemFromCartAction
 
             $product = Product::firstWhere('id', $data->productId);
 
-            $productsInCart = Session::get('productsInCart', []);
-
-            if (isset($productsInCart[$data->productId])) {
-                $product->increment('quantity', $productsInCart[$data->productId]);
-
-                unset($productsInCart[$data->productId]);
-                Session::put('productsInCart', $productsInCart);
+            if($quantity = $this->cart->quantityProduct($product)) {
+                $this->cart->removeProduct($product);
+                $product->increment('quantity', $quantity);
             }
 
             DB::commit();
-        } catch (\Exception) {
+        } catch (\Exception $e) {
             DB::rollBack();
+
+            Log::error($e->getMessage());
         }
     }
 }
