@@ -2,15 +2,16 @@
 
 namespace App\Http\Requests;
 
-use App\Data\RemoveFromCartData;
+use App\Data\AddToCartData;
 use Illuminate\Foundation\Http\FormRequest;
 use Spatie\LaravelData\WithData;
 
-class RemoveItemFromCartRequest extends FormRequest
+class AddProductToCartRequest extends FormRequest
 {
     use WithData;
 
-    protected $dataClass = RemoveFromCartData::class;
+    protected $dataClass = AddToCartData::class;
+
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -30,6 +31,7 @@ class RemoveItemFromCartRequest extends FormRequest
     {
         return [
             'product_id' => 'required|integer',
+            'quantity' => 'required|integer',
         ];
     }
 }
