@@ -18,7 +18,12 @@ class CartPageViewModel extends ViewModel
 
     public function products(): Collection
     {
-        return collect($this->cart->getProducts());
+        $cart = $this->cart->getProducts();
+
+        $productsInCart = array_keys($cart);
+
+        return Product::find($productsInCart)
+            ->each(fn ($product) => $product->quantity = $cart[$product->id]);
     }
 
     public function relatedProducts(): \Illuminate\Database\Eloquent\Collection
