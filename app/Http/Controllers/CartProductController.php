@@ -9,7 +9,7 @@ use App\Http\Requests\RemoveProductFromCartRequest;
 
 class CartProductController extends Controller
 {
-    public function create(AddProductToCartRequest $request, AddProductToCartAction $action)
+    public function store(AddProductToCartRequest $request, AddProductToCartAction $action)
     {
         $action->run($request->getData());
 

@@ -58,6 +58,7 @@
         "barryvdh/laravel-debugbar": "^3.6",
         "barryvdh/laravel-ide-helper": "^2.12",
         "beyondcode/laravel-dump-server": "^1.8",
+        "darkaonline/l5-swagger": "^8.5",
         "fakerphp/faker": "^1.9.1",
         "friendsofphp/php-cs-fixer": "^3.8",
         "laravel/sail": "^1.0.1",

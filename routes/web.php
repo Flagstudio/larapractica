@@ -1,8 +1,5 @@
 <?php
 
-use App\Http\Controllers\CartController;
-use App\Http\Controllers\CartProductController;
-use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,11 +12,4 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/cart', [CartController::class, 'index'])
-    ->name('cart');
 
-Route::post('/cart', [CartProductController::class, 'create'])
-    ->name('cart.addProduct');
-
-Route::delete('/cart/{product}', [CartProductController::class, 'delete'])
-    ->name('cart.removeProduct');
