@@ -28,5 +28,11 @@ Route::delete('/cart/{product}', [CartProductController::class, 'delete'])
 Route::get('/orders', [OrderController::class, 'index'])
     ->name('orders.list');
 
+Route::get('/orders/{order}', [OrderController::class, 'get'])
+    ->name('orders.show');
+
 Route::post('/orders', [OrderController::class, 'store'])
     ->name('orders.store');
+
+Route::delete('/orders', [OrderController::class, 'delete'])
+    ->name('orders.cancel');

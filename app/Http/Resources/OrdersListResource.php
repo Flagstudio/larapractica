@@ -2,13 +2,14 @@
 
 namespace App\Http\Resources;
 
+use App\Enums\OrderStatusEnum;
 use Illuminate\Http\Resources\Json\JsonResource;
 use OpenApi\Attributes\Property;
 use OpenApi\Attributes\Schema;
 
 #[Schema(
     title: 'OrdersListResource',
-    type: 'integer',
+    required: ['id', 'total_price', 'status', 'created_at'],
     properties: [
         new Property(
             property: 'id',
@@ -32,7 +33,7 @@ use OpenApi\Attributes\Schema;
             type: 'string',
         ),
     ],
-    example: ['test' => 123]
+    example: ['id' => 1, 'total_price' => 10.0, 'status' => OrderStatusEnum::new, 'comment' => '', 'created_at' => '2023-01-01 12:00:00']
 )]
 class OrdersListResource extends JsonResource
 {

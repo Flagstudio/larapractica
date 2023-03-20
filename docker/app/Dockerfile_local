@@ -1,5 +1,6 @@
-ARG COMPOSE_PROJECT_NAME
-FROM registry.gitlab.com/flagstudio/${COMPOSE_PROJECT_NAME}:base
+ARG IMAGE_REGISTRY_PATH
+ARG REPOSITORY_NAME
+FROM ${IMAGE_REGISTRY_PATH}/${REPOSITORY_NAME}:base
 
 # Add a non-root user to prevent files being created with root permissions on host machine.
 ARG PUID=1000
