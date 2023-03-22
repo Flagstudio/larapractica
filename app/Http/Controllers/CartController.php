@@ -2,48 +2,35 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\OrdersListResource;
-use App\Responses\OrderNotFoundResponse;
+use App\Http\Resources\CartProductsResource;
 use App\ViewModels\CartPageViewModel;
 use Illuminate\Http\JsonResponse;
+use OpenApi\Attributes\Get;
+use OpenApi\Attributes\Items;
+use OpenApi\Attributes\JsonContent;
+use OpenApi\Attributes\Response;
 use Spatie\ViewModels\ViewModel;
-use OpenApi\Attributes as OA;
 
 class CartController extends Controller
 {
-    #[OA\Get(
+    #[Get(
         path: "/api/cart",
-        description: "Return orders list",
-        summary: "Get orders list",
+        description: "Return products list in cart",
+        summary: "Get products list in cart",
         security: [['X-Device-UUID' => []]],
         tags: ['Cart'],
-        parameters: [
-            new OA\Parameter(
-                name: 'status',
-                description: 'Status of a order',
-                in: 'query',
-                schema: new OA\Schema(ref: '#components/schemas/OrderStatusEnum'),
-            ),
-            new OA\Parameter(
-                name: 'page',
-                description: 'Page of orders list',
-                in: 'query',
-                schema: new OA\Schema(type: 'integer'),
-            ),
-        ],
     )]
-    #[OA\Response(
+    #[Response(
         response: 200,
         description: 'The data',
-        content: new OA\JsonContent(
+        content: new JsonContent(
             type: 'array',
-            items: new OA\Items(ref: OrdersListResource::class),
+            items: new Items(ref: CartProductsResource::class),
         ),
     )]
-    #[OA\Response(
-        response: 404,
-        description: 'Orders not found',
-        content: new OA\JsonContent(ref: OrderNotFoundResponse::class),
+    #[Response(
+        response: 401,
+        description: 'Unauthorized',
     )]
     public function index(CartPageViewModel $viewModel): ViewModel|JsonResponse
     {

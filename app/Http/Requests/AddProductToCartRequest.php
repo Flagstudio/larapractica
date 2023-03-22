@@ -4,8 +4,27 @@ namespace App\Http\Requests;
 
 use App\Data\AddToCartData;
 use Illuminate\Foundation\Http\FormRequest;
+use OpenApi\Attributes\Property;
+use OpenApi\Attributes\Schema;
 use Spatie\LaravelData\WithData;
 
+#[Schema(
+    title: 'AddProductToCartRequest',
+    required: ['product_id', 'quantity'],
+    properties: [
+        new Property(
+            property: 'product_id',
+            description: 'ID товара',
+            type: 'integer',
+        ),
+        new Property(
+            property: 'quantity',
+            description: 'Количество',
+            type: 'integer',
+        ),
+    ],
+    example: ['product_id' => 1, 'quantity' => 1],
+)]
 class AddProductToCartRequest extends FormRequest
 {
     use WithData;
@@ -30,7 +49,7 @@ class AddProductToCartRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'product_id' => 'required|integer',
+            'product_id' => 'required|integer|exists:products',
             'quantity' => 'required|integer',
         ];
     }

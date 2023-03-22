@@ -6,45 +6,36 @@ use App\Actions\AddProductToCartAction;
 use App\Actions\RemoveProductFromCartAction;
 use App\Http\Requests\AddProductToCartRequest;
 use App\Http\Requests\RemoveProductFromCartRequest;
-use App\Http\Resources\OrdersListResource;
-use App\Responses\OrderNotFoundResponse;
-use OpenApi\Attributes as OA;
+use App\Swagger\Responses\ErrorResponse;
+use App\Swagger\Responses\SuccessResponse;
+use OpenApi\Attributes\Delete;
+use OpenApi\Attributes\JsonContent;
+use OpenApi\Attributes\Parameter;
+use OpenApi\Attributes\Post;
+use OpenApi\Attributes\RequestBody;
+use OpenApi\Attributes\Response;
 
 class CartProductController extends Controller
 {
-    #[OA\Post(
+    #[Post(
         path: "/api/cart",
-        description: "Return orders list",
-        summary: "Get orders list",
+        description: "Add product in cart",
+        summary: "Add product in cart",
         security: [['X-Device-UUID' => []]],
+        requestBody: new RequestBody(
+            content: new JsonContent(ref: AddProductToCartRequest::class),
+        ),
         tags: ['Cart'],
-        parameters: [
-            new OA\Parameter(
-                name: 'status',
-                description: 'Status of a order',
-                in: 'query',
-                schema: new OA\Schema(ref: '#components/schemas/OrderStatusEnum'),
-            ),
-            new OA\Parameter(
-                name: 'page',
-                description: 'Page of orders list',
-                in: 'query',
-                schema: new OA\Schema(type: 'integer'),
-            ),
-        ],
     )]
-    #[OA\Response(
+    #[Response(
         response: 200,
         description: 'The data',
-        content: new OA\JsonContent(
-            type: 'array',
-            items: new OA\Items(ref: OrdersListResource::class),
-        ),
+        content: new JsonContent(ref: SuccessResponse::class),
     )]
-    #[OA\Response(
+    #[Response(
         response: 404,
-        description: 'Orders not found',
-        content: new OA\JsonContent(ref: OrderNotFoundResponse::class),
+        description: 'Product not found',
+        content: new JsonContent(ref: ErrorResponse::class, example: ['message' => 'Товар не найден']),
     )]
     public function store(AddProductToCartRequest $request, AddProductToCartAction $action)
     {
@@ -56,39 +47,25 @@ class CartProductController extends Controller
             ]);
     }
 
-    #[OA\Delete(
-        path: "/api/cart",
-        description: "Return orders list",
-        summary: "Get orders list",
+    #[Delete(
+        path: "/api/cart/{product}",
+        description: "Remove product from cart",
+        summary: "Remove product from cart",
         security: [['X-Device-UUID' => []]],
         tags: ['Cart'],
         parameters: [
-            new OA\Parameter(
-                name: 'status',
-                description: 'Status of a order',
-                in: 'query',
-                schema: new OA\Schema(ref: '#components/schemas/OrderStatusEnum'),
-            ),
-            new OA\Parameter(
-                name: 'page',
-                description: 'Page of orders list',
-                in: 'query',
-                schema: new OA\Schema(type: 'integer'),
-            ),
+            new Parameter(ref: '#components/parameters/product'),
         ],
     )]
-    #[OA\Response(
+    #[Response(
         response: 200,
         description: 'The data',
-        content: new OA\JsonContent(
-            type: 'array',
-            items: new OA\Items(ref: OrdersListResource::class),
-        ),
+        content: new JsonContent(ref: SuccessResponse::class),
     )]
-    #[OA\Response(
+    #[Response(
         response: 404,
-        description: 'Orders not found',
-        content: new OA\JsonContent(ref: OrderNotFoundResponse::class),
+        description: 'Product not found',
+        content: new JsonContent(ref: ErrorResponse::class, example: ['message' => 'Товар не найден']),
     )]
     public function delete(RemoveProductFromCartRequest $request, RemoveProductFromCartAction $action)
     {

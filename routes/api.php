@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CartProductController;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\CategoryProductController;
 use App\Http\Controllers\OrderController;
 use Illuminate\Support\Facades\Route;
 
@@ -16,8 +18,20 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+Route::get('/categories', [CategoryController::class, 'index'])
+    ->name('categories.index');
+
+Route::get('/categories/{category}', [CategoryController::class, 'show'])
+    ->name('categories.show');
+
+Route::get('/categories/{category}/products', [CategoryProductController::class, 'index'])
+    ->name('categories.products.index');
+
+Route::get('/categories/{category}/products/{product}', [CategoryProductController::class, 'show'])
+    ->name('categories.products.show');
+
 Route::get('/cart', [CartController::class, 'index'])
-    ->name('cart');
+    ->name('cart.index');
 
 Route::post('/cart', [CartProductController::class, 'store'])
     ->name('cart.addProduct');
