@@ -14,10 +14,10 @@ use Spatie\ViewModels\ViewModel;
 class CartController extends Controller
 {
     #[Get(
-        path: "/api/cart",
-        description: "Return products list in cart",
-        summary: "Get products list in cart",
-        security: [['X-Device-UUID' => []]],
+        path: '/api/cart',
+        description: 'Return products list in cart',
+        summary: 'Get products list in cart',
+        security: [['DeviceUUID' => []]],
         tags: ['Cart'],
     )]
     #[Response(

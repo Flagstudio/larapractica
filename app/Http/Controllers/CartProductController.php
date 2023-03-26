@@ -18,10 +18,10 @@ use OpenApi\Attributes\Response;
 class CartProductController extends Controller
 {
     #[Post(
-        path: "/api/cart",
-        description: "Add product in cart",
-        summary: "Add product in cart",
-        security: [['X-Device-UUID' => []]],
+        path: '/api/cart',
+        description: 'Add product in cart',
+        summary: 'Add product in cart',
+        security: [['DeviceUUID' => []]],
         requestBody: new RequestBody(
             content: new JsonContent(ref: AddProductToCartRequest::class),
         ),
@@ -48,10 +48,10 @@ class CartProductController extends Controller
     }
 
     #[Delete(
-        path: "/api/cart/{product}",
-        description: "Remove product from cart",
-        summary: "Remove product from cart",
-        security: [['X-Device-UUID' => []]],
+        path: '/api/cart/{product}',
+        description: 'Remove product from cart',
+        summary: 'Remove product from cart',
+        security: [['DeviceUUID' => []]],
         tags: ['Cart'],
         parameters: [
             new Parameter(ref: '#components/parameters/product'),

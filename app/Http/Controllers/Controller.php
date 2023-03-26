@@ -10,16 +10,16 @@ use OpenApi\Attributes\Info;
 use OpenApi\Attributes\SecurityScheme;
 
 #[Info(
-    version: "1.0.0",
-    description: "Данное API позволяет пользователю работать с товарами, добавлять их в корзину, и формировать на её основе заказ.",
-    title: "API документация нашего проекта",
+    version: '1.0.0',
+    description: 'Данное API позволяет пользователю работать с товарами, добавлять их в корзину, и формировать на её основе заказ.',
+    title: 'API документация нашего проекта',
 )]
 #[SecurityScheme(
-    securityScheme: "DeviceUUID",
+    securityScheme: 'DeviceUUID',
     type: 'apiKey',
-    description: '',
-    name: "X-Device-UUID",
-    in: "header"
+    description: 'UUID устройства пользователя',
+    name: 'X-Device-UUID',
+    in: 'header',
 )]
 class Controller extends BaseController
 {

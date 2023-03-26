@@ -17,15 +17,14 @@ use OpenApi\Attributes\Parameter;
 use OpenApi\Attributes\Post;
 use OpenApi\Attributes\RequestBody;
 use OpenApi\Attributes\Response;
-use OpenApi\Attributes\Schema;
 
 class OrderController extends Controller
 {
     #[Get(
-        path: "/api/orders",
-        description: "Return orders list",
-        summary: "Get orders list",
-        security: [['X-Device-UUID' => []]],
+        path: '/api/orders',
+        description: 'Return orders list',
+        summary: 'Get orders list',
+        security: [['DeviceUUID' => []]],
         tags: ['Orders'],
         parameters: [
             new Parameter(ref: '#components/parameters/status'),
@@ -61,10 +60,10 @@ class OrderController extends Controller
     }
 
     #[Get(
-        path: "/api/orders/{order}",
-        description: "Return order",
-        summary: "Get orders",
-        security: [['X-Device-UUID' => []]],
+        path: '/api/orders/{order}',
+        description: 'Return order',
+        summary: 'Get orders',
+        security: [['DeviceUUID' => []]],
         tags: ['Orders'],
         parameters: [
             new Parameter(ref: '#components/parameters/order'),
@@ -92,10 +91,10 @@ class OrderController extends Controller
     }
 
     #[Post(
-        path: "/api/orders",
-        description: "Return new order",
-        summary: "Create new order",
-        security: [['X-Device-UUID' => []]],
+        path: '/api/orders',
+        description: 'Return new order',
+        summary: 'Create new order',
+        security: [['DeviceUUID' => []]],
         requestBody: new RequestBody(
             content: new JsonContent(ref: StoreOrderRequest::class),
         ),
@@ -120,10 +119,10 @@ class OrderController extends Controller
     }
 
     #[Delete(
-        path: "/api/orders/{order}",
-        description: "Cancel order",
-        summary: "Cancel orders",
-        security: [['X-Device-UUID' => []]],
+        path: '/api/orders/{order}',
+        description: 'Cancel order',
+        summary: 'Cancel orders',
+        security: [['DeviceUUID' => []]],
         tags: ['Orders'],
         parameters: [
             new Parameter(ref: '#components/parameters/order'),
