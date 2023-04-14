@@ -43,6 +43,7 @@
         "eslint-plugin-vue": "8.7.1",
         "laravel-mix": "6.0.43",
         "laravel-mix-bundle-analyzer": "1.0.5",
+        "openapi-typescript-codegen": "^0.24.0",
         "package-changed": "1.9.0",
         "postcss": "8.4.13",
         "resolve-url-loader": "5.0.0",

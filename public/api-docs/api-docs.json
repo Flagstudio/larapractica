@@ -1,0 +1,709 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "API документация нашего проекта",
+        "description": "Данное API позволяет пользователю работать с товарами, добавлять их в корзину, и формировать на её основе заказ.",
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/api/cart": {
+            "get": {
+                "tags": [
+                    "Cart"
+                ],
+                "summary": "Get products list in cart",
+                "description": "Return products list in cart",
+                "operationId": "0652f94dde92e36bbb3c461356ce1d7b",
+                "responses": {
+                    "200": {
+                        "description": "The data",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/CartProductsResource"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "DeviceUUID": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Cart"
+                ],
+                "summary": "Add product in cart",
+                "description": "Add product in cart",
+                "operationId": "a79408fcd7145629ecfb61694ae189af",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AddProductToCartRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "The data",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SuccessResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Product not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "message": "Товар не найден"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "DeviceUUID": []
+                    }
+                ]
+            }
+        },
+        "/api/cart/{product}": {
+            "delete": {
+                "tags": [
+                    "Cart"
+                ],
+                "summary": "Remove product from cart",
+                "description": "Remove product from cart",
+                "operationId": "0a6367913aadd06beb7bb4a9eff2ce29",
+                "parameters": [
+                    {
+                        "$ref": "#components/parameters/product"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The data",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SuccessResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Product not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "message": "Товар не найден"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "DeviceUUID": []
+                    }
+                ]
+            }
+        },
+        "/api/categories": {
+            "get": {
+                "tags": [
+                    "Category"
+                ],
+                "summary": "Get categories list",
+                "description": "Return categories list",
+                "operationId": "3f5817a34833d0a1f4af4548dd3aeaba",
+                "parameters": [
+                    {
+                        "$ref": "#components/parameters/page"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The data",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SuccessResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/categories/{category}": {
+            "get": {
+                "tags": [
+                    "Category"
+                ],
+                "summary": "Get the category",
+                "description": "Return the category",
+                "operationId": "e92579e78391b6199e78c2a091dbea0a",
+                "parameters": [
+                    {
+                        "$ref": "#components/parameters/category"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The data",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SuccessResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Category not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "message": "Категория не найдена"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/categories/{category}/products": {
+            "get": {
+                "tags": [
+                    "Category"
+                ],
+                "summary": "Get products list of category",
+                "description": "Return products list of category",
+                "operationId": "36687d537a60aa81566d618376f0ade1",
+                "parameters": [
+                    {
+                        "$ref": "#components/parameters/category"
+                    },
+                    {
+                        "$ref": "#components/parameters/page"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The data",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/ProductsResource"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Category not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "message": "Категория не найдена"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/categories/{category}/products/{product}": {
+            "get": {
+                "tags": [
+                    "Category"
+                ],
+                "summary": "Get products list of category",
+                "description": "Return products list of category",
+                "operationId": "a1c39428218e503ca55a0b757770050d",
+                "parameters": [
+                    {
+                        "$ref": "#components/parameters/category"
+                    },
+                    {
+                        "$ref": "#components/parameters/product"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The data",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProductsResource"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "examples": {
+                                    "Category not found": {
+                                        "summary": "Category not found",
+                                        "value": {
+                                            "message": "Категория не найден"
+                                        }
+                                    },
+                                    "Product not found": {
+                                        "summary": "Product not found",
+                                        "value": {
+                                            "message": "Товар не найден"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/orders": {
+            "get": {
+                "tags": [
+                    "Orders"
+                ],
+                "summary": "Get orders list",
+                "description": "Return orders list",
+                "operationId": "2cd7e03021e72d9d799c12dfe179c865",
+                "parameters": [
+                    {
+                        "$ref": "#components/parameters/status"
+                    },
+                    {
+                        "$ref": "#components/parameters/page"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The data",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/OrdersListResource"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "DeviceUUID": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Orders"
+                ],
+                "summary": "Create new order",
+                "description": "Return new order",
+                "operationId": "d690d6834318e9b064df441e854de8b9",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/StoreOrderRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "The data",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OrdersListResource"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "DeviceUUID": []
+                    }
+                ]
+            }
+        },
+        "/api/orders/{order}": {
+            "get": {
+                "tags": [
+                    "Orders"
+                ],
+                "summary": "Get orders",
+                "description": "Return order",
+                "operationId": "f090f23952a43521af6f1d133826bc37",
+                "parameters": [
+                    {
+                        "$ref": "#components/parameters/order"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The data",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OrdersListResource"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Order not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "message": "Заказ не найден"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "DeviceUUID": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Orders"
+                ],
+                "summary": "Cancel orders",
+                "description": "Cancel order",
+                "operationId": "78eaa440967db2292bbfa757f6fc6f44",
+                "parameters": [
+                    {
+                        "$ref": "#components/parameters/order"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The data",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                },
+                                "example": []
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Order not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "message": "Заказ не найден"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "DeviceUUID": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "OrderStatusEnum": {
+                "title": "OrderStatusEnum",
+                "type": "integer",
+                "enum": [
+                    0,
+                    1,
+                    2,
+                    3,
+                    4
+                ]
+            },
+            "AddProductToCartRequest": {
+                "title": "AddProductToCartRequest",
+                "required": [
+                    "product_id",
+                    "quantity"
+                ],
+                "properties": {
+                    "product_id": {
+                        "description": "ID товара",
+                        "type": "integer"
+                    },
+                    "quantity": {
+                        "description": "Количество",
+                        "type": "integer"
+                    }
+                },
+                "type": "object",
+                "example": {
+                    "product_id": 1,
+                    "quantity": 1
+                }
+            },
+            "StoreOrderRequest": {
+                "title": "StoreOrderRequest",
+                "required": [
+                    "total_price"
+                ],
+                "properties": {
+                    "total_price": {
+                        "type": "number",
+                        "format": "float"
+                    },
+                    "comment": {
+                        "type": "string"
+                    }
+                },
+                "type": "object",
+                "example": {
+                    "total_price": 10,
+                    "comment": ""
+                }
+            },
+            "CartProductsResource": {
+                "title": "CartProductsResource",
+                "required": [
+                    "id",
+                    "title",
+                    "quantity"
+                ],
+                "properties": {
+                    "id": {
+                        "description": "ID товара",
+                        "type": "integer"
+                    },
+                    "title": {
+                        "description": "Название товара",
+                        "type": "string"
+                    },
+                    "quantity": {
+                        "description": "Количество в корзине",
+                        "type": "integer"
+                    }
+                },
+                "type": "object",
+                "example": {
+                    "id": 1,
+                    "title": "Название товара",
+                    "quantity": 1
+                }
+            },
+            "OrdersListResource": {
+                "title": "OrdersListResource",
+                "required": [
+                    "id",
+                    "total_price",
+                    "status",
+                    "created_at"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "total_price": {
+                        "type": "number",
+                        "format": "float"
+                    },
+                    "status": {
+                        "$ref": "#components/schemas/OrderStatusEnum"
+                    },
+                    "comment": {
+                        "type": "string"
+                    },
+                    "created_at": {
+                        "type": "string"
+                    }
+                },
+                "type": "object",
+                "example": {
+                    "id": 1,
+                    "total_price": 10,
+                    "status": 0,
+                    "comment": "",
+                    "created_at": "2023-01-01 12:00:00"
+                }
+            },
+            "ProductsResource": {
+                "title": "",
+                "required": [
+                    "id",
+                    "title",
+                    "quantity"
+                ],
+                "properties": {
+                    "id": {
+                        "description": "ID товара",
+                        "type": "integer"
+                    },
+                    "title": {
+                        "description": "Название товара",
+                        "type": "string"
+                    },
+                    "quantity": {
+                        "description": "Количество в корзине",
+                        "type": "integer"
+                    }
+                },
+                "type": "object",
+                "example": {
+                    "product_id": 1,
+                    "title": "Название товара",
+                    "quantity": 3
+                }
+            },
+            "ErrorResponse": {
+                "title": "ErrorResponse",
+                "required": [
+                    "message"
+                ],
+                "properties": {
+                    "message": {
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "SuccessResponse": {
+                "title": "SuccessResponse",
+                "required": [
+                    "status"
+                ],
+                "properties": {
+                    "status": {
+                        "type": "string",
+                        "example": "success"
+                    }
+                },
+                "type": "object",
+                "example": {
+                    "status": "success"
+                }
+            }
+        },
+        "parameters": {
+            "category": {
+                "name": "category",
+                "in": "path",
+                "description": "ID категории",
+                "required": true,
+                "schema": {
+                    "type": "integer"
+                },
+                "example": 1
+            },
+            "order": {
+                "name": "order",
+                "in": "path",
+                "description": "ID заказа",
+                "required": true,
+                "schema": {
+                    "type": "integer"
+                },
+                "example": 1
+            },
+            "status": {
+                "name": "status",
+                "in": "query",
+                "description": "Статус заказа",
+                "schema": {
+                    "$ref": "#components/schemas/OrderStatusEnum"
+                },
+                "example": 1
+            },
+            "page": {
+                "name": "page",
+                "in": "query",
+                "description": "Номер страницы",
+                "schema": {
+                    "type": "integer"
+                },
+                "example": 2
+            },
+            "product": {
+                "name": "product",
+                "in": "path",
+                "description": "ID товара",
+                "required": true,
+                "schema": {
+                    "type": "integer"
+                },
+                "example": 1
+            }
+        },
+        "securitySchemes": {
+            "DeviceUUID": {
+                "type": "apiKey",
+                "description": "UUID устройства пользователя",
+                "name": "X-Device-UUID",
+                "in": "header"
+            }
+        }
+    }
+}
